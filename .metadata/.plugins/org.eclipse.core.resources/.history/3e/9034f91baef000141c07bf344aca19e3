@@ -1,0 +1,9 @@
+package nl.saxion.twitterclient;
+
+import java.net.URL;
+
+public class Tweet {
+	private String createdAt, text, userName, location;
+	private URL profileImage;
+
+}
