@@ -1,0 +1,5 @@
+package nl.saxion.rn.projecttwitterclient;
+
+public class TweetAdapter extends Arr{
+
+}

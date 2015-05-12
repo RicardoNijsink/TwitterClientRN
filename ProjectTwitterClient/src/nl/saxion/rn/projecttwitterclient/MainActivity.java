@@ -1,17 +1,84 @@
 package nl.saxion.rn.projecttwitterclient;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 import android.app.Activity;
+import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
+import android.widget.TextView;
 
 public class MainActivity extends Activity {
+	private ListView list;
+	private TweetAdapter adapter;
+	private TwitterModel model;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		list = (ListView)findViewById(R.id.listView1);
+		
+		model = new TwitterModel();
+		//adapter = new TweetAdapter(this, R.layout.tweet, model.getTweets());
+		TextView text = (TextView)findViewById(R.id.textView1);
+		try{
+		String result = readAssetIntoString("searchresult.json");
+		text.setText(result);
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			text.setText("Fout");
+			System.err.print("Bestand niet gevonden");
+		}
+		//model.addObserver(adapter);
+	
+//		list.setOnItemClickListener(new OnItemClickListener() {
+//			
+//		});
+		//list.setAdapter(adapter);
+		
 	}
+	
+ 	/**
+     * Reads an asset file and returns a string with the full contents.
+     *
+     * @param filename  The filename of the file to read.
+     * @return          The contents of the file.
+     * @throws IOException  If file could not be found or not read.
+     */
+    private String readAssetIntoString(String filename) throws IOException {
+		BufferedReader br = null;
+		StringBuilder sb = new StringBuilder();
+ 
+		String line;
+		try {
+			InputStream is = getAssets().open(filename, AssetManager.ACCESS_BUFFER);
+			br = new BufferedReader(new InputStreamReader(is));
+			while ((line = br.readLine()) != null) {
+				sb.append(line);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+            throw e;
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return sb.toString();	
+    }
+	
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

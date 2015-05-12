@@ -1,0 +1,15 @@
+package nl.saxion.rn.projecttwitterclient;
+
+import java.util.List;
+
+import android.content.Context;
+import android.widget.ArrayAdapter;
+
+public class TweetAdapter extends ArrayAdapter<Tweet>{
+
+	public TweetAdapter(Context context, int resource, List<Tweet> objects) {
+		super(context, resource, objects);
+		
+	}
+
+}
