@@ -7,10 +7,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 
-import nl.rn.projecttwitterclient.model.HashTag;
+
 import nl.rn.projecttwitterclient.model.Tweet;
-import nl.rn.projecttwitterclient.model.TwitterModel;
-import nl.rn.projecttwitterclient.model.User;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,6 +17,7 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.content.res.AssetManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;

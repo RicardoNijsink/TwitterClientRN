@@ -15,10 +15,10 @@ public class ParseTest extends TestCase {
 	
 	@Test
 	public void parseTest() {
-		try {
+/**		try {
 			FileReader reader = new FileReader(filePath);
 			
 			JSONParser parser = new JSONParser();
 		}
-	}
+*/	}
 }
