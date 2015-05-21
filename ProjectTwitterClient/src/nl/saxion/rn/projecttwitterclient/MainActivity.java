@@ -1,9 +1,12 @@
 package nl.saxion.rn.projecttwitterclient;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.res.AssetManager;
@@ -25,18 +28,21 @@ public class MainActivity extends Activity {
 		
 		list = (ListView)findViewById(R.id.listView1);
 		
-		model = new TwitterModel();
-		//adapter = new TweetAdapter(this, R.layout.tweet, model.getTweets());
-		TextView text = (TextView)findViewById(R.id.textView1);
-		try{
-		String result = readAssetIntoString("searchresult.json");
-		text.setText(result);
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-			text.setText("Fout");
-			System.err.print("Bestand niet gevonden");
-		}
+		File input = new File("searchresult.json");
+		JSONObject statuses = new JSONObject();
+		
+//		model = new TwitterModel();
+//		//adapter = new TweetAdapter(this, R.layout.tweet, model.getTweets());
+//		TextView text = (TextView)findViewById(R.id.textView1);
+//		try{
+//		String result = readAssetIntoString("searchresult.json");
+//		text.setText(result);
+//		}
+//		catch (IOException e) {
+//			e.printStackTrace();
+//			text.setText("Fout");
+//			System.err.print("Bestand niet gevonden");
+//		}
 		//model.addObserver(adapter);
 	
 //		list.setOnItemClickListener(new OnItemClickListener() {
