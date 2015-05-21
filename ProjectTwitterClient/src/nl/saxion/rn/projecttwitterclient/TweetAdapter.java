@@ -6,7 +6,6 @@ import java.util.Observer;
 
 import android.content.Context;
 import nl.rn.projecttwitterclient.model.Tweet;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.text.Spannable;
