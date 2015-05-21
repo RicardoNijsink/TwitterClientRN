@@ -4,13 +4,8 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-<<<<<<< HEAD
 import android.content.Context;
-=======
-import nl.rn.projecttwitterclient.model.HashTag;
 import nl.rn.projecttwitterclient.model.Tweet;
-import nl.rn.projecttwitterclient.model.TwitterModel;
-import nl.rn.projecttwitterclient.model.User;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -18,7 +13,6 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
->>>>>>> 58dc39ef621f2b3c92ae9dbc651da78a2719ac16
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -48,7 +42,7 @@ public class TweetAdapter extends ArrayAdapter<Tweet> implements Observer{
 			TextView text = (TextView)convertView.findViewById(R.id.textViewTweet);
 			TextView createdAt = (TextView)convertView.findViewById(R.id.textViewTweetCreatedAt);
 			TextView retweets = (TextView)convertView.findViewById(R.id.textViewLocation);
-			ImageView userProfilePicture = (ImageView)convertView.findViewById(R.id.imageViewUserProfilePicture);<<<<<<< HEAD
+			ImageView userProfilePicture = (ImageView)convertView.findViewById(R.id.imageViewUserProfilePicture);
 						
 			
 			userName.setOnClickListener(new OnClickListener() {
