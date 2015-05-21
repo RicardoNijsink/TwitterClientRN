@@ -5,9 +5,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import nl.rn.projecttwitterclient.model.HashTag;
+import nl.rn.projecttwitterclient.model.Tweet;
+import nl.rn.projecttwitterclient.model.TwitterModel;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.content.res.AssetManager;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
@@ -24,25 +34,56 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		
 		list = (ListView)findViewById(R.id.listView1);
+		TwitterApplication app = (TwitterApplication) getApplicationContext();
 		
-		model = new TwitterModel();
-		//adapter = new TweetAdapter(this, R.layout.tweet, model.getTweets());
-		TextView text = (TextView)findViewById(R.id.textView1);
+		model = app.getModel();
+
 		try{
-		String result = readAssetIntoString("searchresult.json");
-		text.setText(result);
+			String result = readAssetIntoString("searchresult.json");
+			Log.d("Test", "Geslaagd");
+			JSONObject statuses = new JSONObject(result);
+			JSONArray statusArray = statuses.getJSONArray("statuses");
+			
+			for(int i = 0; i < statusArray.length(); i++) {
+				JSONObject tweet = statusArray.getJSONObject(i);
+				String createdAt = tweet.getString("created_at");
+				String text = tweet.getString("text");
+				
+				JSONObject user = new JSONObject(tweet.getString("user"));
+				String name = user.getString("name");
+				String location = user.getString("location");
+				String description = user.getString("description");
+				
+				Tweet tweetToAdd = new Tweet(createdAt, text, name, location);
+				
+				JSONObject entities = new JSONObject(tweet.getString("entities"));
+				JSONArray hashTags = entities.getJSONArray("hashtags");
+				
+//				for(int counter = 0; counter < hashTags.length(); counter++){
+//					JSONObject hashTag = hashTags.getJSONObject(i);
+//					JSONArray indices = hashTag.getJSONArray("indices");
+//					
+//					int begin = indices.getInt(0);
+//					int end = indices.getInt(1);
+//					
+//					HashTag hashTagToAdd = new HashTag(begin, end);
+//					tweetToAdd.addHashTag(hashTagToAdd);
+//				}
+				
+				model.addTweet(tweetToAdd);
+			}
 		}
 		catch (IOException e) {
 			e.printStackTrace();
-			text.setText("Fout");
-			System.err.print("Bestand niet gevonden");
+			Log.d("Test", "Fout");
 		}
+		catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		adapter = new TweetAdapter(this, R.layout.tweet, model.getTweets());
 		//model.addObserver(adapter);
-	
-//		list.setOnItemClickListener(new OnItemClickListener() {
-//			
-//		});
-		//list.setAdapter(adapter);
+		list.setAdapter(adapter);
 		
 	}
 	
