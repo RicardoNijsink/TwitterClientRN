@@ -4,14 +4,15 @@ import java.net.URL;
 import java.util.ArrayList;
 
 public class Tweet {
-	private String createdAt, text, userName, location;
+	private String createdAt, text, location;
+	private User user;
 	private URL profileImage;
-	private ArrayList<Entity> hashTags = new ArrayList<>();
+	private ArrayList<HashTag> hashTags = new ArrayList<>();
 	
-	public Tweet(String createdAt, String text, String userName, String location) {
+	public Tweet(String createdAt, String text, User user, String location) {
 		this.createdAt = createdAt;
 		this.text = text;
-		this.userName = userName;
+		this.user = user;
 		this.location = location;
 	}
 	
@@ -21,8 +22,8 @@ public class Tweet {
 	public String getText() {
 		return text;
 	}
-	public String getUserName() {
-		return userName;
+	public User getUser() {
+		return user;
 	}
 	public String getLocation() {
 		return location;
@@ -31,7 +32,7 @@ public class Tweet {
 		return profileImage;
 	}
 	
-	public ArrayList<Entity> getHashTags() {
+	public ArrayList<HashTag> getHashTags() {
 		return hashTags;
 	}
 	
