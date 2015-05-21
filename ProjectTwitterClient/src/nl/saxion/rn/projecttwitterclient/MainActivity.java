@@ -6,6 +6,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+
+import nl.rn.projecttwitterclient.model.HashTag;
+import nl.rn.projecttwitterclient.model.Tweet;
+import nl.rn.projecttwitterclient.model.TwitterModel;
+import nl.rn.projecttwitterclient.model.User;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
@@ -28,8 +36,9 @@ public class MainActivity extends Activity {
 		
 		list = (ListView)findViewById(R.id.listView1);
 		
-		File input = new File("searchresult.json");
-		JSONObject statuses = new JSONObject();
+		model = app.getModel();
+
+		parseJSON();
 		
 //		model = new TwitterModel();
 //		//adapter = new TweetAdapter(this, R.layout.tweet, model.getTweets());
@@ -103,5 +112,55 @@ public class MainActivity extends Activity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	public void parseJSON() {
+		try{
+			String result = readAssetIntoString("searchresult.json");
+			Log.d("JSON inlezen", "Geslaagd");
+			JSONObject statuses = new JSONObject(result);
+			JSONArray statusArray = statuses.getJSONArray("statuses");
+			
+			for(int i = 0; i < statusArray.length(); i++) {
+				JSONObject tweet = statusArray.getJSONObject(i);
+				String createdAt = tweet.getString("created_at");
+				String text = tweet.getString("text");
+				
+				JSONObject user = new JSONObject(tweet.getString("user"));
+				String name = user.getString("name");
+				String location = user.getString("location");
+				String description = user.getString("description");
+				int followersCount = user.getInt("followers_count");
+				int friendsCount = user.getInt("friends_count");
+				
+				User userToAdd = new User(createdAt, description, location, name, followersCount, friendsCount);
+				model.addUser(userToAdd);
+				
+				Tweet tweetToAdd = new Tweet(createdAt, text, userToAdd, location);
+				
+				JSONObject entities = new JSONObject(tweet.getString("entities"));
+				JSONArray hashTags = entities.getJSONArray("hashtags");
+				
+				for(int counter = 0; counter < hashTags.length(); counter++){
+					JSONObject hashTag = hashTags.getJSONObject(counter);
+					JSONArray indices = hashTag.getJSONArray("indices");
+					
+					int begin = indices.getInt(0);
+					int end = indices.getInt(1);
+					
+					HashTag hashTagToAdd = new HashTag(begin, end);
+					tweetToAdd.addHashTag(hashTagToAdd);
+				}
+				
+				model.addTweet(tweetToAdd);
+			}
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			Log.d("Test", "Fout");
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 }
