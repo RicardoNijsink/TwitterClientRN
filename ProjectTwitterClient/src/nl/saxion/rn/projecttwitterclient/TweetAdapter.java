@@ -8,6 +8,7 @@ import java.util.Observer;
 
 import nl.rn.projecttwitterclient.model.HashTag;
 import nl.rn.projecttwitterclient.model.Tweet;
+import nl.rn.projecttwitterclient.model.TwitterModel;
 import nl.rn.projecttwitterclient.model.User;
 import android.content.Context;
 import android.content.Intent;
