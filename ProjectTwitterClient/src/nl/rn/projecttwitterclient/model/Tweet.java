@@ -3,6 +3,7 @@ package nl.rn.projecttwitterclient.model;
 import java.net.URL;
 import java.util.ArrayList;
 
+import nl.saxion.rn.projecttwitterclient.HashTag;
 import nl.saxion.rn.projecttwitterclient.User;
 
 public class Tweet {
