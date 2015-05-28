@@ -3,8 +3,6 @@ package nl.rn.projecttwitterclient.model;
 import java.net.URL;
 import java.util.ArrayList;
 
-import nl.saxion.rn.projecttwitterclient.User;
-
 public class Tweet {
 	private String createdAt, text, location;
 	private User user;

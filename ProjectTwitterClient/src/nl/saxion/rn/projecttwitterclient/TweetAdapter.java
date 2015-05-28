@@ -1,17 +1,23 @@
 package nl.saxion.rn.projecttwitterclient;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import android.content.Context;
+import nl.rn.projecttwitterclient.model.HashTag;
 import nl.rn.projecttwitterclient.model.Tweet;
+import nl.rn.projecttwitterclient.model.User;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.ParseException;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -23,6 +29,7 @@ import android.widget.TextView;
 public class TweetAdapter extends ArrayAdapter<Tweet> implements Observer{
 	private LayoutInflater inflater;
 	private Context context;
+	private TwitterModel model;
 
 	public TweetAdapter(Context context, int resource, List<Tweet> objects) {
 		super(context, resource, objects);
@@ -35,14 +42,14 @@ public class TweetAdapter extends ArrayAdapter<Tweet> implements Observer{
 			if(convertView == null){
 				convertView = inflater.inflate(R.layout.tweet, parent, false);
 			}
+			
 			Tweet t = getItem(position);
 			
-			final TextView userName = (TextView)convertView.findViewById(R.id.textViewUserName);
+			TextView userName = (TextView)convertView.findViewById(R.id.textViewUserName);
 			TextView text = (TextView)convertView.findViewById(R.id.textViewTweet);
 			TextView createdAt = (TextView)convertView.findViewById(R.id.textViewTweetCreatedAt);
-			TextView retweets = (TextView)convertView.findViewById(R.id.textViewLocation);
+			TextView location = (TextView)convertView.findViewById(R.id.textViewLocation);
 			ImageView userProfilePicture = (ImageView)convertView.findViewById(R.id.imageViewUserProfilePicture);
-						
 			
 			userName.setOnClickListener(new OnClickListener() {
 				
@@ -54,11 +61,12 @@ public class TweetAdapter extends ArrayAdapter<Tweet> implements Observer{
 					
 				}
 			});
+
+		    createdAt.setText("" + t.getCreatedAt());
 			userName.setText("" + t.getUser().getName());
 			text.setText(setSpanColor(t));
-
-			createdAt.setText("" + t.getCreatedAt());
-			retweets.setText("" + t.getLocation());
+			
+			location.setText("" + t.getLocation());
 			return convertView;
 		}
 
