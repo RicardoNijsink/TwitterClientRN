@@ -8,7 +8,9 @@ import java.io.InputStreamReader;
 import nl.rn.projecttwitterclient.model.HashTag;
 import nl.rn.projecttwitterclient.model.Tweet;
 import nl.rn.projecttwitterclient.model.TwitterModel;
+import nl.rn.projecttwitterclient.model.URL;
 import nl.rn.projecttwitterclient.model.User;
+import nl.rn.projecttwitterclient.model.UserMention;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -123,8 +125,10 @@ public class MainActivity extends Activity {
 				String description = user.getString("description");
 				int followersCount = user.getInt("followers_count");
 				int friendsCount = user.getInt("friends_count");
+				String profileImageURL = user.getString("profile_image_url");
 				
 				User userToAdd = new User(createdAt, description, location, name, followersCount, friendsCount);
+				userToAdd.setProfileImage(profileImageURL);
 				model.addUser(userToAdd);
 				
 				Tweet tweetToAdd = new Tweet(createdAt, text, userToAdd, location);
@@ -132,15 +136,57 @@ public class MainActivity extends Activity {
 				JSONObject entities = new JSONObject(tweet.getString("entities"));
 				JSONArray hashTags = entities.getJSONArray("hashtags");
 				
-				for(int counter = 0; counter < hashTags.length(); counter++){
-					JSONObject hashTag = hashTags.getJSONObject(counter);
-					JSONArray indices = hashTag.getJSONArray("indices");
+				if(hashTags.length() != 0){
+					for(int counter = 0; counter < hashTags.length(); counter++){
+						JSONObject hashTag = hashTags.getJSONObject(counter);
+						JSONArray hashtagIndices = hashTag.getJSONArray("indices");
+						
+						int hashtagBegin = hashtagIndices.getInt(0);
+						int hashtagEnd = hashtagIndices.getInt(1);
+						
+						HashTag hashTagToAdd = new HashTag(hashtagBegin, hashtagEnd);
+						tweetToAdd.addHashTag(hashTagToAdd);
+					}
+				}
+				
+				try{
+					JSONArray urls = entities.getJSONArray("media");
 					
-					int begin = indices.getInt(0);
-					int end = indices.getInt(1);
+					if(urls.length() != 0){
+						for(int urlcounter = 0; urlcounter < urls.length(); urlcounter++){
+							JSONObject url = urls.getJSONObject(urlcounter);
+							JSONArray urlIndices = url.getJSONArray("indices");
+							
+							int urlBegin = urlIndices.getInt(0);
+							int urlEnd = urlIndices.getInt(1);
+							
+							URL urlToAdd = new URL(urlBegin, urlEnd);
+							tweetToAdd.addURL(urlToAdd);
+						}
+					}
+				}
+				catch(Exception e){
+					Log.d("URL", "Geen URL");
+				}
+				
+				try{
+					JSONArray userMentions = entities.getJSONArray("user_mentions");
 					
-					HashTag hashTagToAdd = new HashTag(begin, end);
-					tweetToAdd.addHashTag(hashTagToAdd);
+					if(userMentions.length() != 0){
+						for(int userMentionsCounter = 0; userMentionsCounter < userMentions.length(); userMentionsCounter++){
+							JSONObject userMention = userMentions.getJSONObject(userMentionsCounter);
+							JSONArray userMentionIndices = userMention.getJSONArray("indices");
+							
+							int userMentionBegin = userMentionIndices.getInt(0);
+							int userMentionEnd = userMentionIndices.getInt(1);
+							
+							UserMention userMentionToAdd = new UserMention(userMentionBegin, userMentionEnd);
+							tweetToAdd.addUserMention(userMentionToAdd);
+						}
+					}
+				}
+				catch(Exception e){
+					Log.d("UserMention", "Geen User Mention");
 				}
 				
 				model.addTweet(tweetToAdd);

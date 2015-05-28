@@ -5,7 +5,7 @@ import java.net.URL;
 public class User {
 	private String createdAt, description, location, name;
 	private int followersCount, friendsCount;
-	private URL profileImage;
+	private String profileImage;
 	
 	public User(String createdAt, String description, String location, String name, int followersCount, int friendsCount) {
 		this.createdAt = createdAt;
@@ -14,6 +14,10 @@ public class User {
 		this.name = name;
 		this.followersCount = followersCount;
 		this.friendsCount = friendsCount;
+	}
+
+	public void setProfileImage(String profileImage) {
+		this.profileImage = profileImage;
 	}
 
 	public String getCreatedAt() {
@@ -40,7 +44,7 @@ public class User {
 		return friendsCount;
 	}
 
-	public URL getProfileImage() {
+	public String getProfileImage() {
 		return profileImage;
 	}
 

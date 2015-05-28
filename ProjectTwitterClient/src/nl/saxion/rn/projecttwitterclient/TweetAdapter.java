@@ -1,5 +1,7 @@
 package nl.saxion.rn.projecttwitterclient;
 
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -9,11 +11,16 @@ import java.util.Observer;
 import nl.rn.projecttwitterclient.model.HashTag;
 import nl.rn.projecttwitterclient.model.Tweet;
 import nl.rn.projecttwitterclient.model.TwitterModel;
+import nl.rn.projecttwitterclient.model.URL;
 import nl.rn.projecttwitterclient.model.User;
+import nl.rn.projecttwitterclient.model.UserMention;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.ParseException;
+import android.os.AsyncTask;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ClickableSpan;
@@ -31,6 +38,9 @@ public class TweetAdapter extends ArrayAdapter<Tweet> implements Observer{
 	private LayoutInflater inflater;
 	private Context context;
 	private TwitterModel model;
+	private Bitmap bitmap;
+	private Tweet t;
+	private ImageView userProfilePicture;
 
 	public TweetAdapter(Context context, int resource, List<Tweet> objects) {
 		super(context, resource, objects);
@@ -44,13 +54,13 @@ public class TweetAdapter extends ArrayAdapter<Tweet> implements Observer{
 				convertView = inflater.inflate(R.layout.tweet, parent, false);
 			}
 			
-			Tweet t = getItem(position);
+			t = getItem(position);
 			
 			TextView userName = (TextView)convertView.findViewById(R.id.textViewUserName);
 			TextView text = (TextView)convertView.findViewById(R.id.textViewTweet);
 			TextView createdAt = (TextView)convertView.findViewById(R.id.textViewTweetCreatedAt);
 			TextView location = (TextView)convertView.findViewById(R.id.textViewLocation);
-			ImageView userProfilePicture = (ImageView)convertView.findViewById(R.id.imageViewUserProfilePicture);
+			userProfilePicture = (ImageView)convertView.findViewById(R.id.imageViewUserProfilePicture);
 			
 			userName.setOnClickListener(new OnClickListener() {
 				
@@ -66,8 +76,29 @@ public class TweetAdapter extends ArrayAdapter<Tweet> implements Observer{
 		    createdAt.setText("" + t.getCreatedAt());
 			userName.setText("" + t.getUser().getName());
 			text.setText(setSpanColor(t));
-			
 			location.setText("" + t.getLocation());
+			
+			new AsyncTask<Void, Void, Void>() {                  
+	            @Override
+	            protected Void doInBackground(Void... params) {
+	                try {
+	                    InputStream in = new java.net.URL(t.getUser().getProfileImage()).openStream();
+	                    bitmap = BitmapFactory.decodeStream(in);
+	                } catch (Exception e) {
+	                   // log error
+	                }
+	                return null;
+	            }
+
+	            @Override
+	            protected void onPostExecute(Void result) {
+	                if (bitmap != null)
+	                	userProfilePicture.setImageBitmap(bitmap);
+	            }
+
+	       }.execute();
+			
+			
 			return convertView;
 		}
 
@@ -83,7 +114,35 @@ public class TweetAdapter extends ArrayAdapter<Tweet> implements Observer{
 				spanText.setSpan(new ForegroundColorSpan(Color.BLUE), hashTag.getBeginPosition(), hashTag.getEndPosition(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 			}
 			
+			if(t.getUrls().size() != 0){
+				for(int counter = 0; counter < t.getUrls().size(); counter++){
+					URL url = t.getUrls().get(counter);
+					spanText.setSpan(new ForegroundColorSpan(Color.BLUE), url.getBeginPosition(), url.getEndPosition(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+				}
+			}
+			
+			if(t.getUserMentions().size() != 0){
+				for(int umCounter = 0; umCounter < t.getUrls().size(); umCounter++){
+					UserMention userMention = t.getUserMentions().get(umCounter);
+					spanText.setSpan(new ForegroundColorSpan(Color.BLUE), userMention.getBeginPosition(), userMention.getEndPosition(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+				}
+			}
+			
 			return spanText;
 		}
+		
+//		public Bitmap GetBitmapfromUrl(String scr) {
+//		    try {
+//		    	
+//
+//
+//
+//		    } catch (Exception e) {
+//		        // TODO Auto-generated catch block
+//		        e.printStackTrace();
+//		        return null;
+//
+//		    }
+//		}
 
 }

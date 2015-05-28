@@ -1,13 +1,15 @@
 package nl.rn.projecttwitterclient.model;
 
-import java.net.URL;
+
 import java.util.ArrayList;
 
 public class Tweet {
 	private String createdAt, text, location;
 	private User user;
-	private URL profileImage;
+	private java.net.URL profileImage;
 	private ArrayList<HashTag> hashTags = new ArrayList<>();
+	private ArrayList<URL> urls = new ArrayList<>();
+	private ArrayList<UserMention> userMentions = new ArrayList<>();
 	
 	public Tweet(String createdAt, String text, User user, String location) {
 		this.createdAt = createdAt;
@@ -28,7 +30,7 @@ public class Tweet {
 	public String getLocation() {
 		return location;
 	}
-	public URL getProfileImage() {
+	public java.net.URL getProfileImage() {
 		return profileImage;
 	}
 	
@@ -38,6 +40,22 @@ public class Tweet {
 	
 	public void addHashTag(HashTag hashTag) {
 		hashTags.add(hashTag);
+	}
+	
+	public ArrayList<URL> getUrls() {
+		return urls;
+	}
+	
+	public void addURL(URL url) {
+		urls.add(url);
+	}
+	
+	public ArrayList<UserMention> getUserMentions() {
+		return userMentions;
+	}
+	
+	public void addUserMention(UserMention userMention) {
+		userMentions.add(userMention);
 	}
 	
 
