@@ -1,5 +1,7 @@
 package nl.saxion.rn.projecttwitterclient;
 
+import nl.rn.projecttwitterclient.model.TwitterModel;
+import nl.rn.projecttwitterclient.model.User;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
