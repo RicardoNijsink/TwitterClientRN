@@ -1,4 +1,4 @@
-package nl.rn.projecttwitterclient.model;
+package nl.saxion.rn.projecttwitterclient;
 
 import java.net.URL;
 

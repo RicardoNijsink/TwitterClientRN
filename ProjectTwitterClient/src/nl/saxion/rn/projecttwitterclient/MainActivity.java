@@ -1,14 +1,14 @@
 package nl.saxion.rn.projecttwitterclient;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import nl.rn.projecttwitterclient.model.Hashtag;
+
+
 import nl.rn.projecttwitterclient.model.Tweet;
-import nl.rn.projecttwitterclient.model.TwitterModel;
-import nl.rn.projecttwitterclient.model.User;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,7 +21,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.TextView;
 
 public class MainActivity extends Activity {
 	private ListView list;
@@ -34,15 +34,29 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		
 		list = (ListView)findViewById(R.id.listView1);
-		TwitterApplication app = (TwitterApplication) getApplicationContext();
 		
 		model = app.getModel();
 
 		parseJSON();
 		
-		adapter = new TweetAdapter(this, R.layout.tweet, model.getTweets());
+//		model = new TwitterModel();
+//		//adapter = new TweetAdapter(this, R.layout.tweet, model.getTweets());
+//		TextView text = (TextView)findViewById(R.id.textView1);
+//		try{
+//		String result = readAssetIntoString("searchresult.json");
+//		text.setText(result);
+//		}
+//		catch (IOException e) {
+//			e.printStackTrace();
+//			text.setText("Fout");
+//			System.err.print("Bestand niet gevonden");
+//		}
 		//model.addObserver(adapter);
-		list.setAdapter(adapter);
+	
+//		list.setOnItemClickListener(new OnItemClickListener() {
+//			
+//		});
+		//list.setAdapter(adapter);
 		
 	}
 	
@@ -99,16 +113,10 @@ public class MainActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 	
-	/**
-	 * Parses a JSON-file to classes.
-	 * Gets the tweets and users and adds them to the model.
-	 *  
-	 */
 	public void parseJSON() {
 		try{
 			String result = readAssetIntoString("searchresult.json");
 			Log.d("JSON inlezen", "Geslaagd");
-			
 			JSONObject statuses = new JSONObject(result);
 			JSONArray statusArray = statuses.getJSONArray("statuses");
 			
@@ -139,7 +147,7 @@ public class MainActivity extends Activity {
 					int begin = indices.getInt(0);
 					int end = indices.getInt(1);
 					
-					Hashtag hashTagToAdd = new Hashtag(begin, end);
+					HashTag hashTagToAdd = new HashTag(begin, end);
 					tweetToAdd.addHashTag(hashTagToAdd);
 				}
 				
@@ -147,10 +155,8 @@ public class MainActivity extends Activity {
 			}
 		}
 		catch (IOException e) {
-			Toast toast = new Toast(getApplicationContext());
-			toast.setText("Couldn't find data");
-			toast.show();
-			Log.d("JSON uitlezen", "Fout");
+			e.printStackTrace();
+			Log.d("Test", "Fout");
 		}
 		catch (JSONException e) {
 			e.printStackTrace();

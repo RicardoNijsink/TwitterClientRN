@@ -1,0 +1,35 @@
+1 package nl.rn.projecttwitterclient.model; 
+2 
+ 
+3 public class HashTag extends Entity { 
+4 	private int beginPosition, endPosition; 
+5 	 
+6 	public HashTag(int begin, int end) { 
+7 		this.beginPosition = begin; 
+8 		this.endPosition = end; 
+9 	} 
+10 
+ 
+11 	public int getBeginPosition() { 
+12 		return beginPosition; 
+13 	} 
+14 
+ 
+15 	public void setBeginPosition(int beginPosition) { 
+16 		this.beginPosition = beginPosition; 
+17 	} 
+18 
+ 
+19 	public int getEndPosition() { 
+20 		return endPosition; 
+21 	} 
+22 
+ 
+23 	public void setEndPosition(int endPosition) { 
+24 		this.endPosition = endPosition; 
+25 	} 
+26 	 
+27 	 
+28 
+ 
+29 } 

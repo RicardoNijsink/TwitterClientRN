@@ -3,11 +3,13 @@ package nl.rn.projecttwitterclient.model;
 import java.net.URL;
 import java.util.ArrayList;
 
+import nl.saxion.rn.projecttwitterclient.User;
+
 public class Tweet {
 	private String createdAt, text, location;
 	private User user;
 	private URL profileImage;
-	private ArrayList<Hashtag> hashtags = new ArrayList<>();
+	private ArrayList<HashTag> hashTags = new ArrayList<>();
 	
 	public Tweet(String createdAt, String text, User user, String location) {
 		this.createdAt = createdAt;
@@ -32,12 +34,12 @@ public class Tweet {
 		return profileImage;
 	}
 	
-	public ArrayList<Hashtag> getHashTags() {
-		return hashtags;
+	public ArrayList<HashTag> getHashTags() {
+		return hashTags;
 	}
 	
-	public void addHashTag(Hashtag hashTag) {
-		hashtags.add(hashTag);
+	public void addHashTag(HashTag hashTag) {
+		hashTags.add(hashTag);
 	}
 	
 
