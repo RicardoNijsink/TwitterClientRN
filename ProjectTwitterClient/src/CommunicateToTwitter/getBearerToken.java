@@ -7,6 +7,7 @@ import org.apache.http.entity.StringEntity;
 
 import android.util.Base64;
 
+//misschien handig om hier een asynchrone task van te maken??
 public class getBearerToken {
 
 	private static final String API_KEY = "cvTfgu6ARayg6Ly4oMPNe53cu";
