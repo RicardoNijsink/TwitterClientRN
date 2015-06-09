@@ -77,26 +77,27 @@ public class TweetAdapter extends ArrayAdapter<Tweet> implements Observer{
 			userName.setText("" + t.getUser().getName());
 			text.setText(setSpanColor(t));
 			location.setText("" + t.getLocation());
+			new DownloadImageTask(userProfilePicture).execute(t.getUser().getProfileImage());
 			
-			new AsyncTask<Void, Void, Void>() {                  
-	            @Override
-	            protected Void doInBackground(Void... params) {
-	                try {
-	                    InputStream in = new java.net.URL(t.getUser().getProfileImage()).openStream();
-	                    bitmap = BitmapFactory.decodeStream(in);
-	                } catch (Exception e) {
-	                   // log error
-	                }
-	                return null;
-	            }
-
-	            @Override
-	            protected void onPostExecute(Void result) {
-	                if (bitmap != null)
-	                	userProfilePicture.setImageBitmap(bitmap);
-	            }
-
-	       }.execute();
+//			new AsyncTask<Void, Void, Bitmap>() {                  
+//	            @Override
+//	            protected Bitmap doInBackground(Void... params) {
+//	                try {
+//	                    InputStream in = new java.net.URL(t.getUser().getProfileImage()).openStream();
+//	                    bitmap = BitmapFactory.decodeStream(in);
+//	                } catch (Exception e) {
+//	                   // log error
+//	                }
+//	                return null;
+//	            }
+//
+//	            @Override
+//	            protected void onPostExecute(Bitmap result) {
+//	                if (bitmap != null)
+//	                	userProfilePicture.setImageBitmap(result);
+//	            }
+//
+//	       }.execute();
 			
 			
 			return convertView;
@@ -131,18 +132,29 @@ public class TweetAdapter extends ArrayAdapter<Tweet> implements Observer{
 			return spanText;
 		}
 		
-//		public Bitmap GetBitmapfromUrl(String scr) {
-//		    try {
-//		    	
-//
-//
-//
-//		    } catch (Exception e) {
-//		        // TODO Auto-generated catch block
-//		        e.printStackTrace();
-//		        return null;
-//
-//		    }
-//		}
+		private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+			  ImageView bmImage;
+
+			  public DownloadImageTask(ImageView bmImage) {
+			      this.bmImage = bmImage;
+			  }
+
+			  protected Bitmap doInBackground(String... urls) {
+			      String urldisplay = urls[0];
+			      Bitmap mIcon11 = null;
+			      try {
+			        InputStream in = new java.net.URL(urldisplay).openStream();
+			        mIcon11 = BitmapFactory.decodeStream(in);
+			      } catch (Exception e) {
+			          Log.e("Error", e.getMessage());
+			          e.printStackTrace();
+			      }
+			      return mIcon11;
+			  }
+
+			  protected void onPostExecute(Bitmap result) {
+			      bmImage.setImageBitmap(result);
+			  }
+			}
 
 }
