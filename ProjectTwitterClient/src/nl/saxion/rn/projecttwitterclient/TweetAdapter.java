@@ -38,7 +38,6 @@ public class TweetAdapter extends ArrayAdapter<Tweet> implements Observer{
 	private LayoutInflater inflater;
 	private Context context;
 	private TwitterModel model;
-	private Bitmap bitmap;
 	private Tweet t;
 	private ImageView userProfilePicture;
 
@@ -77,7 +76,7 @@ public class TweetAdapter extends ArrayAdapter<Tweet> implements Observer{
 			userName.setText("" + t.getUser().getName());
 			text.setText(setSpanColor(t));
 			location.setText("" + t.getLocation());
-			new DownloadImageTask(userProfilePicture).execute(t.getUser().getProfileImage());
+			new DownloadImageTask(userProfilePicture).execute(t.getUser().getProfileImageURL());
 			
 //			new AsyncTask<Void, Void, Bitmap>() {                  
 //	            @Override
@@ -141,15 +140,15 @@ public class TweetAdapter extends ArrayAdapter<Tweet> implements Observer{
 
 			  protected Bitmap doInBackground(String... urls) {
 			      String urldisplay = urls[0];
-			      Bitmap mIcon11 = null;
+			      Bitmap images = null;
 			      try {
 			        InputStream in = new java.net.URL(urldisplay).openStream();
-			        mIcon11 = BitmapFactory.decodeStream(in);
+			        images = BitmapFactory.decodeStream(in);
 			      } catch (Exception e) {
 			          Log.e("Error", e.getMessage());
 			          e.printStackTrace();
 			      }
-			      return mIcon11;
+			      return images;
 			  }
 
 			  protected void onPostExecute(Bitmap result) {

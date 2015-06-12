@@ -1,9 +1,11 @@
 package nl.rn.projecttwitterclient.model;
 
+import org.json.JSONObject;
+
 public class HashTag extends Entity {
 	
-	public HashTag(int begin, int end) {
-		super(begin, end);
+	public HashTag(JSONObject hashTag) {
+		super(hashTag);
 	}
 	
 	

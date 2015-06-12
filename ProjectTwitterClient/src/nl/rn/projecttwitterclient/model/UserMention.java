@@ -1,9 +1,11 @@
 package nl.rn.projecttwitterclient.model;
 
+import org.json.JSONObject;
+
 public class UserMention extends Entity {
 
-	public UserMention(int begin, int end) {
-		super(begin, end);
+	public UserMention(JSONObject userMention) {
+		super(userMention);
 	}
 
 }

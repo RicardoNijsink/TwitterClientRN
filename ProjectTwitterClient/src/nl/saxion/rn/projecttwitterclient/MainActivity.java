@@ -116,80 +116,87 @@ public class MainActivity extends Activity {
 			
 			for(int i = 0; i < statusArray.length(); i++) {
 				JSONObject tweet = statusArray.getJSONObject(i);
-				String createdAt = tweet.getString("created_at");
-				String text = tweet.getString("text");
 				
-				JSONObject user = new JSONObject(tweet.getString("user"));
-				String name = user.getString("name");
-				String location = user.getString("location");
-				String description = user.getString("description");
-				int followersCount = user.getInt("followers_count");
-				int friendsCount = user.getInt("friends_count");
-				String profileImageURL = user.getString("profile_image_url");
+				Tweet tweetToAdd = new Tweet(statusArray.getJSONObject(i));
 				
-				User userToAdd = new User(createdAt, description, location, name, followersCount, friendsCount);
-				userToAdd.setProfileImage(profileImageURL);
-				model.addUser(userToAdd);
+//				String createdAt = tweet.getString("created_at");
+//				String text = tweet.getString("text");
+//				
+//				JSONObject user = new JSONObject(tweet.getString("user"));
+//				String name = user.getString("name");
+//				String location = user.getString("location");
+//				String description = user.getString("description");
+//				int followersCount = user.getInt("followers_count");
+//				int friendsCount = user.getInt("friends_count");
+//				String profileImageURL = user.getString("profile_image_url");
+//				
+//				User userToAdd = new User(createdAt, description, location, name, followersCount, friendsCount);
+//				userToAdd.setProfileImage(profileImageURL);
+//				model.addUser(userToAdd);
+//				
+//				Tweet tweetToAdd = new Tweet(createdAt, text, userToAdd, location);
 				
-				Tweet tweetToAdd = new Tweet(createdAt, text, userToAdd, location);
+//				JSONObject entities = new JSONObject(tweet.getString("entities"));
+//				JSONArray hashTags = entities.getJSONArray("hashtags");
+//				
+//				if(hashTags.length() != 0){
+//					for(int counter = 0; counter < hashTags.length(); counter++){
+//						JSONObject hashTag = hashTags.getJSONObject(counter);
+//						JSONArray hashtagIndices = hashTag.getJSONArray("indices");
+//						
+//						int hashtagBegin = hashtagIndices.getInt(0);
+//						int hashtagEnd = hashtagIndices.getInt(1);
+//						
+//						HashTag hashTagToAdd = new HashTag(hashtagBegin, hashtagEnd);
+//						tweetToAdd.addHashTag(hashTagToAdd);
+//					}
+//				}
+//				
+//				try{
+//					JSONArray urls = entities.getJSONArray("media");
+//					
+//					if(urls.length() != 0){
+//						for(int urlcounter = 0; urlcounter < urls.length(); urlcounter++){
+//							JSONObject url = urls.getJSONObject(urlcounter);
+//							JSONArray urlIndices = url.getJSONArray("indices");
+//							
+//							int urlBegin = urlIndices.getInt(0);
+//							int urlEnd = urlIndices.getInt(1);
+//							
+//							URL urlToAdd = new URL(urlBegin, urlEnd);
+//							tweetToAdd.addURL(urlToAdd);
+//						}
+//					}
+//				}
+//				catch(Exception e){
+//					Log.d("URL", "Geen URL");
+//				}
+//				
+//				try{
+//					JSONArray userMentions = entities.getJSONArray("user_mentions");
+//					
+//					if(userMentions.length() != 0){
+//						for(int userMentionsCounter = 0; userMentionsCounter < userMentions.length(); userMentionsCounter++){
+//							JSONObject userMention = userMentions.getJSONObject(userMentionsCounter);
+//							JSONArray userMentionIndices = userMention.getJSONArray("indices");
+//							
+//							int userMentionBegin = userMentionIndices.getInt(0);
+//							int userMentionEnd = userMentionIndices.getInt(1);
+//							
+//							UserMention userMentionToAdd = new UserMention(userMentionBegin, userMentionEnd);
+//							tweetToAdd.addUserMention(userMentionToAdd);
+//						}
+//					}
+//				}
+//				catch(Exception e){
+//					Log.d("UserMention", "Geen User Mention");
+//				}
 				
-				JSONObject entities = new JSONObject(tweet.getString("entities"));
-				JSONArray hashTags = entities.getJSONArray("hashtags");
-				
-				if(hashTags.length() != 0){
-					for(int counter = 0; counter < hashTags.length(); counter++){
-						JSONObject hashTag = hashTags.getJSONObject(counter);
-						JSONArray hashtagIndices = hashTag.getJSONArray("indices");
-						
-						int hashtagBegin = hashtagIndices.getInt(0);
-						int hashtagEnd = hashtagIndices.getInt(1);
-						
-						HashTag hashTagToAdd = new HashTag(hashtagBegin, hashtagEnd);
-						tweetToAdd.addHashTag(hashTagToAdd);
-					}
-				}
-				
-				try{
-					JSONArray urls = entities.getJSONArray("media");
-					
-					if(urls.length() != 0){
-						for(int urlcounter = 0; urlcounter < urls.length(); urlcounter++){
-							JSONObject url = urls.getJSONObject(urlcounter);
-							JSONArray urlIndices = url.getJSONArray("indices");
-							
-							int urlBegin = urlIndices.getInt(0);
-							int urlEnd = urlIndices.getInt(1);
-							
-							URL urlToAdd = new URL(urlBegin, urlEnd);
-							tweetToAdd.addURL(urlToAdd);
-						}
-					}
-				}
-				catch(Exception e){
-					Log.d("URL", "Geen URL");
-				}
-				
-				try{
-					JSONArray userMentions = entities.getJSONArray("user_mentions");
-					
-					if(userMentions.length() != 0){
-						for(int userMentionsCounter = 0; userMentionsCounter < userMentions.length(); userMentionsCounter++){
-							JSONObject userMention = userMentions.getJSONObject(userMentionsCounter);
-							JSONArray userMentionIndices = userMention.getJSONArray("indices");
-							
-							int userMentionBegin = userMentionIndices.getInt(0);
-							int userMentionEnd = userMentionIndices.getInt(1);
-							
-							UserMention userMentionToAdd = new UserMention(userMentionBegin, userMentionEnd);
-							tweetToAdd.addUserMention(userMentionToAdd);
-						}
-					}
-				}
-				catch(Exception e){
-					Log.d("UserMention", "Geen User Mention");
-				}
-				
+				if(tweetToAdd != null){
 				model.addTweet(tweetToAdd);
+				model.addUser(tweetToAdd.getUser());
+				}
+				Log.d("Tweets", String.valueOf(model.getTweets().size()));
 			}
 		}
 		catch (IOException e) {

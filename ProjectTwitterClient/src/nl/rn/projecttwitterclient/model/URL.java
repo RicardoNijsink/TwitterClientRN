@@ -1,8 +1,10 @@
 package nl.rn.projecttwitterclient.model;
 
+import org.json.JSONObject;
+
 public class URL extends Entity{
 	
-	public URL(int begin, int end) {
-		super(begin, end);
+	public URL(JSONObject url) {
+		super(url);
 	}
 }
