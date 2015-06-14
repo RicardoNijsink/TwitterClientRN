@@ -16,12 +16,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import CommunicateToTwitter.TaskGetTweets;
 import android.app.Activity;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -36,7 +41,21 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		
 		list = (ListView)findViewById(R.id.listView1);
+		Button buttonStartSearch = (Button) findViewById(R.id.buttonStartSearch);
+		final EditText editTextSearch = (EditText) findViewById(R.id.editTextSearch);
+		
 		TwitterApplication app = (TwitterApplication) getApplicationContext();
+		
+		buttonStartSearch.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				TaskGetTweets task = new TaskGetTweets();
+				task.execute(editTextSearch.getText().toString());
+				
+			}
+			
+		});
 		
 		model = app.getModel();
 

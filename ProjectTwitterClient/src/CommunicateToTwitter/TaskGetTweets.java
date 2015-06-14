@@ -10,14 +10,20 @@ import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.os.AsyncTask;
+import android.util.Log;
 											//params progress result
 public class TaskGetTweets extends AsyncTask<String, Double, JSONObject> {
 
 	@Override
 	protected JSONObject doInBackground(String... params) {
+		
+		if(params == null) {
+			return null;
+		}
 		
 		String search = "";
 		for(int i = 0; i < params.length; i++) {
@@ -56,14 +62,20 @@ public class TaskGetTweets extends AsyncTask<String, Double, JSONObject> {
 		//je ontvangt een String van twitter
 		
 		//deel om de String naar een JSONObject te parsen
+		JSONObject jason = null;
+		try {
+			jason = new JSONObject(result);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			Log.d("het json resultaat", "omvormen kan niet");
+			e.printStackTrace();
+		}
 		
-		return null;//returned de JSONObject
+		return jason;//returned de JSONObject
 	}
 	
 	protected void onProgressUpdate(Double... percent) {
 		//iets om de voortgang weer te geven
+		//zet hoeveel gedownload/TOTAAL in een label ofzo via een methode in de scherm activity
 	}
-
-
-
 }
