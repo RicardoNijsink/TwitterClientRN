@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.concurrent.ExecutionException;
 
 import nl.rn.projecttwitterclient.model.HashTag;
 import nl.rn.projecttwitterclient.model.Tweet;
@@ -17,6 +18,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import CommunicateToTwitter.TaskGetTweets;
+import CommunicateToTwitter.BearerTokenManager;
 import android.app.Activity;
 import android.content.res.AssetManager;
 import android.os.Bundle;
@@ -34,6 +36,8 @@ public class MainActivity extends Activity {
 	private ListView list;
 	private TweetAdapter adapter;
 	private TwitterModel model;
+	private JSONObject searchResult;
+	private BearerTokenManager bearerTokenManager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -46,25 +50,35 @@ public class MainActivity extends Activity {
 		
 		TwitterApplication app = (TwitterApplication) getApplicationContext();
 		
-		buttonStartSearch.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				TaskGetTweets task = new TaskGetTweets();
-				task.execute(editTextSearch.getText().toString());
-				
-			}
-			
-		});
-		
 		model = app.getModel();
-
-		parseJSON();
+		bearerTokenManager = new BearerTokenManager(model);
+		
+		Log.d("Bearer token", model.bearerToken);
+		Log.d("Bearer token manager", bearerTokenManager.bearerToken);
 		
 		adapter = new TweetAdapter(this, R.layout.tweet, model.getTweets());
 		//model.addObserver(adapter);
 		list.setAdapter(adapter);
 		
+		buttonStartSearch.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				TaskGetTweets task = new TaskGetTweets(model);
+				try {
+					searchResult = task.execute(editTextSearch.getText().toString()).get();
+					parseJSON(searchResult);
+					adapter.notifyDataSetChanged();
+				} catch (InterruptedException e) {
+				
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					
+					e.printStackTrace();
+				}
+			}
+			
+		});
 	}
 	
  	/**
@@ -125,12 +139,13 @@ public class MainActivity extends Activity {
 	 * Gets the tweets and users and adds them to the model.
 	 *  
 	 */
-	public void parseJSON() {
+	public void parseJSON(JSONObject statuses) {
 		try{
-			String result = readAssetIntoString("searchresult.json");
+			
+//			String result = readAssetIntoString("searchresult.json");
 			Log.d("JSON inlezen", "Geslaagd");
 			
-			JSONObject statuses = new JSONObject(result);
+			//JSONObject statuses = new JSONObject(result);
 			JSONArray statusArray = statuses.getJSONArray("statuses");
 			
 			for(int i = 0; i < statusArray.length(); i++) {
@@ -145,14 +160,15 @@ public class MainActivity extends Activity {
 				Log.d("Tweets", String.valueOf(model.getTweets().size()));
 			}
 		}
-		catch (IOException e) {
-			Toast toast = new Toast(getApplicationContext());
-			toast.setText("Couldn't find data");
-			toast.show();
-			Log.d("JSON uitlezen", "Fout");
-		}
+//		catch (IOException e) {
+//			Toast toast = new Toast(getApplicationContext());
+//			toast.setText("Couldn't find data");
+//			toast.show();
+//			Log.d("JSON uitlezen", "Fout");
+//		}
 		catch (JSONException e) {
-			e.printStackTrace();
+			Toast.makeText(getApplicationContext(), "Couldn't find data", Toast.LENGTH_LONG).show();
+			Log.d("JSON uitlezen", "Fout");
 		}
 	}
 }

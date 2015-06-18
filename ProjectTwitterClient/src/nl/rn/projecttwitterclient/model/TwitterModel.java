@@ -7,7 +7,7 @@ import java.util.Observer;
 public class TwitterModel extends Observable implements Observer{
 	private ArrayList<Tweet> tweets = new ArrayList<>();
 	private ArrayList<User> users = new ArrayList<>();
-	//public JSON
+	public String bearerToken = "";
 	
 	public void addUser(User u) {
 		users.add(u);

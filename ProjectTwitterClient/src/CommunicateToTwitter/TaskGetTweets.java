@@ -4,12 +4,19 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import nl.rn.projecttwitterclient.model.TwitterModel;
+import nl.saxion.rn.projecttwitterclient.TwitterApplication;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -17,6 +24,11 @@ import android.os.AsyncTask;
 import android.util.Log;
 											//params progress result
 public class TaskGetTweets extends AsyncTask<String, Double, JSONObject> {
+	private TwitterModel model;
+	
+	public TaskGetTweets(TwitterModel model) {
+		this.model = model;
+	}
 
 	@Override
 	protected JSONObject doInBackground(String... params) {
@@ -40,14 +52,18 @@ public class TaskGetTweets extends AsyncTask<String, Double, JSONObject> {
 		}
 		
 		HttpClient client = new DefaultHttpClient();
-		HttpGet httpGet = new HttpGet(encodedSearch);
+		HttpGet httpGet = new HttpGet("https://api.twitter.com/1.1/search/tweets.json?q=" + encodedSearch);
+		
+		httpGet.setHeader("Authorization", "Bearer " + model.bearerToken);
+		Log.d("Bearer token request", model.bearerToken);
+		
 		
 		ResponseHandler<String> handler = new BasicResponseHandler();
-		
 		String result = "";
 		
 		try {
 			result = client.execute(httpGet, handler);
+			Log.d("Result Tweets", result);
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
