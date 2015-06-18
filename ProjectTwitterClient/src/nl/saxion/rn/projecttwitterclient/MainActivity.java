@@ -20,6 +20,7 @@ import org.json.JSONObject;
 import CommunicateToTwitter.TaskGetTweets;
 import CommunicateToTwitter.BearerTokenManager;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -64,7 +65,7 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				TaskGetTweets task = new TaskGetTweets(model);
+				TaskGetTweets task = new TaskGetTweets(bearerTokenManager);
 				try {
 					searchResult = task.execute(editTextSearch.getText().toString()).get();
 					parseJSON(searchResult);

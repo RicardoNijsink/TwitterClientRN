@@ -9,6 +9,7 @@ import nl.saxion.rn.projecttwitterclient.TwitterApplication;
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
 import oauth.signpost.commonshttp.CommonsHttpOAuthProvider;
 import oauth.signpost.exception.OAuthCommunicationException;
+import oauth.signpost.exception.OAuthException;
 import oauth.signpost.exception.OAuthExpectationFailedException;
 import oauth.signpost.exception.OAuthMessageSignerException;
 import oauth.signpost.exception.OAuthNotAuthorizedException;
@@ -18,6 +19,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -35,6 +37,9 @@ public class BearerTokenManager {
 	private static final String OAUTH_REQUEST_URL = "https://api.twitter.com/oauth/request_token";
 	private static final String OAUTH_ACCESS_URL = "https://api.twitter.com/oauth/access_token";
 	private static final String OAUTH_AUTHORIZE_URL = "https://api.twitter.com/oauth/authorize";
+	public static final String CALL_BACK_URL = "https://apps.twitter.com/app/new";
+	private String oauthVerifier = "";
+
 	private TwitterModel model;
 	private boolean loggedIn = false;
 	public String bearerToken = "";
@@ -77,6 +82,10 @@ public class BearerTokenManager {
 			e.printStackTrace();
 		}
 		return url;
+	}
+	
+	public void retreiveAccessToken() {
+		new RetreiveAccessToken().execute();
 	}
 	
 	private class getBearerToken extends AsyncTask<Void, Void, String>{
@@ -154,7 +163,7 @@ public class BearerTokenManager {
 		protected String doInBackground(Void... params) {
 			String url = "";
 			try {
-				url = oAuthProvider.retrieveRequestToken(oAuthConsumer, "https://apps.twitter.com/app/new");
+				url = oAuthProvider.retrieveRequestToken(oAuthConsumer, CALL_BACK_URL);
 			} catch (OAuthMessageSignerException | OAuthNotAuthorizedException
 					| OAuthExpectationFailedException
 					| OAuthCommunicationException e) {
@@ -165,5 +174,50 @@ public class BearerTokenManager {
 			return url;
 		}
 		
+	}
+	
+	private class RetreiveAccessToken extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			try {
+				oAuthProvider.retrieveAccessToken(oAuthConsumer, oauthVerifier);
+				Log.d("Access token", oAuthConsumer.getToken());
+			} catch (OAuthMessageSignerException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (OAuthNotAuthorizedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (OAuthExpectationFailedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (OAuthCommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return null;
+		}
+	}
+	
+	public void signWithUserToken(HttpRequestBase request) throws OAuthException {
+		assert isLoggedIn() : "User not logged in";	
+		oAuthConsumer.sign(request);	
+	}	
+
+	public boolean isLoggedIn() {
+		return loggedIn;
+	}
+
+	public void setLoggedIn(boolean loggedIn) {
+		this.loggedIn = loggedIn;
+	}
+
+	public static String getCallBackUrl() {
+		return CALL_BACK_URL;
+	}
+	
+	public void setOauthVerifier(String oauth_verifier) {
+		this.oauthVerifier = oauth_verifier;
 	}
 }

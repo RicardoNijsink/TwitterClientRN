@@ -8,6 +8,7 @@ import nl.rn.projecttwitterclient.model.TwitterModel;
 import nl.saxion.rn.projecttwitterclient.TwitterApplication;
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
 import oauth.signpost.commonshttp.CommonsHttpOAuthProvider;
+import oauth.signpost.exception.OAuthException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -27,9 +28,10 @@ import android.util.Log;
 											//params progress result
 public class TaskGetTweets extends AsyncTask<String, Double, JSONObject> {
 	private TwitterModel model;
+	private BearerTokenManager manager;
 	
-	public TaskGetTweets(TwitterModel model) {
-		this.model = model;
+	public TaskGetTweets(BearerTokenManager manager) {
+		this.manager = manager;
 	}
 
 	@Override
@@ -56,8 +58,14 @@ public class TaskGetTweets extends AsyncTask<String, Double, JSONObject> {
 		HttpClient client = new DefaultHttpClient();
 		HttpGet httpGet = new HttpGet("https://api.twitter.com/1.1/search/tweets.json?q=" + encodedSearch);
 		
-		httpGet.setHeader("Authorization", "Bearer " + model.bearerToken);
-		Log.d("Bearer token request", model.bearerToken);
+		//httpGet.setHeader("Authorization", "Bearer " + model.bearerToken);
+		try {
+			manager.signWithUserToken(httpGet);
+		} catch (OAuthException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		//Log.d("Bearer token request", model.bearerToken);
 		
 		
 		ResponseHandler<String> handler = new BasicResponseHandler();
@@ -65,7 +73,6 @@ public class TaskGetTweets extends AsyncTask<String, Double, JSONObject> {
 		
 		try {
 			result = client.execute(httpGet, handler);
-			Log.d("Result Tweets", result);
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -85,7 +92,7 @@ public class TaskGetTweets extends AsyncTask<String, Double, JSONObject> {
 			jason = new JSONObject(result);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
-			Log.d("het json resultaat", "omvormen kan niet");
+			Log.d("JSON parsen uit tweets", "Omvormen kan niet");
 			e.printStackTrace();
 		}
 		

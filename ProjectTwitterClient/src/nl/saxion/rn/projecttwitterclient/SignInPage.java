@@ -2,10 +2,13 @@ package nl.saxion.rn.projecttwitterclient;
 
 import CommunicateToTwitter.BearerTokenManager;
 import android.app.Activity;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 public class SignInPage extends Activity {
 	BearerTokenManager manager;
@@ -21,6 +24,24 @@ public class SignInPage extends Activity {
 		manager = app.getManager();
 		
 		webview.loadUrl(manager.getRequestToken());
+		
+		webview.setWebViewClient(new WebViewClient() {
+			@Override
+			public boolean shouldOverrideUrlLoading(WebView view, String url) {
+				if(url.startsWith(BearerTokenManager.CALL_BACK_URL));
+				manager.setLoggedIn(true);
+				
+				Uri verifierCode = Uri.parse(url);
+				String oauth_verifier = verifierCode.getQueryParameter("oauth_verifier");
+				Log.d("Verifier", oauth_verifier);
+				
+				manager.setOauthVerifier(oauth_verifier);
+				manager.retreiveAccessToken();
+				
+				finish();
+				return true;
+			}
+		});
 	}
 
 	@Override
