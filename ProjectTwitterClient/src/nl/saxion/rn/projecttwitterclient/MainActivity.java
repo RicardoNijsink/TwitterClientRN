@@ -51,7 +51,7 @@ public class MainActivity extends Activity {
 		TwitterApplication app = (TwitterApplication) getApplicationContext();
 		
 		model = app.getModel();
-		bearerTokenManager = new BearerTokenManager(model);
+		bearerTokenManager = app.getManager();
 		
 		Log.d("Bearer token", model.bearerToken);
 		Log.d("Bearer token manager", bearerTokenManager.bearerToken);

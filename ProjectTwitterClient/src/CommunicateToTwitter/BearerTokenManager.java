@@ -8,6 +8,10 @@ import nl.rn.projecttwitterclient.model.TwitterModel;
 import nl.saxion.rn.projecttwitterclient.TwitterApplication;
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
 import oauth.signpost.commonshttp.CommonsHttpOAuthProvider;
+import oauth.signpost.exception.OAuthCommunicationException;
+import oauth.signpost.exception.OAuthExpectationFailedException;
+import oauth.signpost.exception.OAuthMessageSignerException;
+import oauth.signpost.exception.OAuthNotAuthorizedException;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -28,25 +32,20 @@ public class BearerTokenManager {
 
 	private static final String API_KEY = "cvTfgu6ARayg6Ly4oMPNe53cu";
 	private static final String API_SECRET = "qlouhSjduvfb9EAqz9iiCUQfgnBG0fCVsxTJX5q9S5HLzBwEvh";
+	private static final String OAUTH_REQUEST_URL = "https://api.twitter.com/oauth/request_token";
+	private static final String OAUTH_ACCESS_URL = "https://api.twitter.com/oauth/access_token";
+	private static final String OAUTH_AUTHORIZE_URL = "https://api.twitter.com/oauth/authorize";
 	private TwitterModel model;
 	private boolean loggedIn = false;
 	public String bearerToken = "";
-
+	public String url = "";
+	
 	private CommonsHttpOAuthConsumer oAuthConsumer;
 	private CommonsHttpOAuthProvider oAuthProvider;
 	
-	private void init() {
-		oAuthConsumer = new CommonsHttpOAuthConsumer(API_KEY, API_SECRET);
-		oAuthProvider = new CommonsHttpOAuthProvider("https://api.twitter.com/oauth/request_token", "https://api.twitter.com/oauth/access_token", "https://api.twitter.com/oauth/authorize");
-	}
-	
-	public boolean isUserLoggedIn() {
-		return loggedIn;
-	}
-	
 	public BearerTokenManager(TwitterModel model){
-		this.model = model;
 		init();
+		this.model = model;
 		try {
 			this.bearerToken = new getBearerToken().execute().get();
 		} catch (InterruptedException e) {
@@ -56,6 +55,28 @@ public class BearerTokenManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	private void init() {
+		oAuthConsumer = new CommonsHttpOAuthConsumer(API_KEY, API_SECRET);
+		oAuthProvider = new CommonsHttpOAuthProvider(OAUTH_REQUEST_URL, OAUTH_ACCESS_URL, OAUTH_AUTHORIZE_URL);
+	}
+	
+	public boolean isUserLoggedIn() {
+		return loggedIn;
+	}
+	
+	public String getRequestToken() {
+		try {
+			this.url = new GetRequestToken().execute().get();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return url;
 	}
 	
 	private class getBearerToken extends AsyncTask<Void, Void, String>{
@@ -125,5 +146,24 @@ public class BearerTokenManager {
 			}
 			return bearerToken;
 		}
+	}
+	
+	private class GetRequestToken extends AsyncTask<Void, Void, String> {
+
+		@Override
+		protected String doInBackground(Void... params) {
+			String url = "";
+			try {
+				url = oAuthProvider.retrieveRequestToken(oAuthConsumer, "https://apps.twitter.com/app/new");
+			} catch (OAuthMessageSignerException | OAuthNotAuthorizedException
+					| OAuthExpectationFailedException
+					| OAuthCommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			return url;
+		}
+		
 	}
 }

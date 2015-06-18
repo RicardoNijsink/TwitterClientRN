@@ -1,18 +1,26 @@
 package nl.saxion.rn.projecttwitterclient;
 
+import CommunicateToTwitter.BearerTokenManager;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.WebView;
 
 public class SignInPage extends Activity {
+	BearerTokenManager manager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_sign_in_page);
 		
+		WebView webview = (WebView)findViewById(R.id.webView1);
+		TwitterApplication app = (TwitterApplication)getApplicationContext();
 		
+		manager = app.getManager();
+		
+		webview.loadUrl(manager.getRequestToken());
 	}
 
 	@Override

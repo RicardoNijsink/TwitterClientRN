@@ -28,6 +28,15 @@ public class MenuActivity extends Activity {
 			}
 			
 		});
+		
+		buttonInloggen.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(MenuActivity.this, SignInPage.class);
+				startActivity(intent);
+			}
+		});
 	}
 
 	@Override
