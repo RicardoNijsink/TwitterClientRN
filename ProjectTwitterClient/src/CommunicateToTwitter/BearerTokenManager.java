@@ -6,6 +6,8 @@ import java.util.concurrent.ExecutionException;
 
 import nl.rn.projecttwitterclient.model.TwitterModel;
 import nl.saxion.rn.projecttwitterclient.TwitterApplication;
+import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
+import oauth.signpost.commonshttp.CommonsHttpOAuthProvider;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -27,10 +29,24 @@ public class BearerTokenManager {
 	private static final String API_KEY = "cvTfgu6ARayg6Ly4oMPNe53cu";
 	private static final String API_SECRET = "qlouhSjduvfb9EAqz9iiCUQfgnBG0fCVsxTJX5q9S5HLzBwEvh";
 	private TwitterModel model;
+	private boolean loggedIn = false;
 	public String bearerToken = "";
+
+	private CommonsHttpOAuthConsumer oAuthConsumer;
+	private CommonsHttpOAuthProvider oAuthProvider;
+	
+	private void init() {
+		oAuthConsumer = new CommonsHttpOAuthConsumer(API_KEY, API_SECRET);
+		oAuthProvider = new CommonsHttpOAuthProvider("https://api.twitter.com/oauth/request_token", "https://api.twitter.com/oauth/access_token", "https://api.twitter.com/oauth/authorize");
+	}
+	
+	public boolean isUserLoggedIn() {
+		return loggedIn;
+	}
 	
 	public BearerTokenManager(TwitterModel model){
 		this.model = model;
+		init();
 		try {
 			this.bearerToken = new getBearerToken().execute().get();
 		} catch (InterruptedException e) {

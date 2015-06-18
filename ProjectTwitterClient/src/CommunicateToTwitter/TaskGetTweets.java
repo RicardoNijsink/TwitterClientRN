@@ -6,6 +6,8 @@ import java.net.URLEncoder;
 
 import nl.rn.projecttwitterclient.model.TwitterModel;
 import nl.saxion.rn.projecttwitterclient.TwitterApplication;
+import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
+import oauth.signpost.commonshttp.CommonsHttpOAuthProvider;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
