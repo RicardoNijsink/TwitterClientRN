@@ -4,5 +4,7 @@
     <string name="app_name">ProjectTwitterClient</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_menu">MenuActivity</string>
+    <string name="title_activity_sign_in_page">SignInPage</string>
 
 </resources>
