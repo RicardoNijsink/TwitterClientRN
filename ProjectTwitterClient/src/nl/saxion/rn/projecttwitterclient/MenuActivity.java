@@ -22,6 +22,8 @@ public class MenuActivity extends Activity {
 		Button buttonZoeken = (Button) findViewById(R.id.buttonZoeken);
 		Button buttonInloggen = (Button) findViewById(R.id.buttonInloggen);
 		Button buttonTimeLine = (Button) findViewById(R.id.buttonTimeLine);
+		Button buttonTweet = (Button) findViewById(R.id.buttonTweet);
+
 		TwitterApplication app = (TwitterApplication)getApplicationContext();
 		
 		manager = app.getManager();
@@ -66,6 +68,18 @@ public class MenuActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				
+			}
+			
+		});
+		
+		buttonTweet.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				if(manager.isLoggedIn()) {
+					Intent intent = new Intent(MenuActivity.this, TweetActivity.class);
+					startActivity(intent);
+				}
 			}
 			
 		});
