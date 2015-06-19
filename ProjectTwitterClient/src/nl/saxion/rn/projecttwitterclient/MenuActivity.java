@@ -18,7 +18,6 @@ public class MenuActivity extends Activity {
 		
 		Button buttonZoeken = (Button) findViewById(R.id.buttonZoeken);
 		Button buttonInloggen = (Button) findViewById(R.id.buttonInloggen);
-		Button buttonTimeline = (Button) findViewById(R.id.buttonTimeLine);
 		
 		buttonZoeken.setOnClickListener(new OnClickListener() {
 
@@ -38,17 +37,8 @@ public class MenuActivity extends Activity {
 				startActivity(intent);
 			}
 		});
-
-		buttonTimeline.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				
-			}
-			
-		});
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
