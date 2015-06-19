@@ -69,13 +69,11 @@ public class Tweet {
 				}
 			}
 			catch(JSONException e){
-				Log.d("Henk", "Henk");
+				Log.d("Entities parsen", "Mislukt");
 			}
 			
 		JSONObject userToAdd = new JSONObject(tweet.getString("user"));
 		user = new User(userToAdd);
-		Log.d("Test", "Hoi5");
-		
 		}
 		catch(JSONException e){
 			Log.d("Tweet parsen", "Mislukt");

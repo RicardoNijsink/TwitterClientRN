@@ -6,5 +6,6 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_menu">MenuActivity</string>
     <string name="title_activity_sign_in_page">SignInPage</string>
+    <string name="title_activity_time_line">TimeLineActivity</string>
 
 </resources>

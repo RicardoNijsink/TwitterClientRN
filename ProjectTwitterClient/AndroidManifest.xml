@@ -37,6 +37,10 @@
             android:name=".SignInPage"
             android:label="@string/title_activity_sign_in_page" >
         </activity>
+        <activity
+            android:name=".TimeLineActivity"
+            android:label="@string/title_activity_time_line" >
+        </activity>
     </application>
 
 </manifest>

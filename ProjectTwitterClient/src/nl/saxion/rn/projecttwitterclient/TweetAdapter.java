@@ -75,29 +75,10 @@ public class TweetAdapter extends ArrayAdapter<Tweet> implements Observer{
 		    createdAt.setText("" + t.getCreatedAt());
 			userName.setText("" + t.getUser().getName());
 			text.setText(setSpanColor(t));
-			location.setText("" + t.getLocation());
+			if(location != null){
+				location.setText("" + t.getLocation());
+			}
 			new DownloadImageTask(userProfilePicture).execute(t.getUser().getProfileImageURL());
-			
-//			new AsyncTask<Void, Void, Bitmap>() {                  
-//	            @Override
-//	            protected Bitmap doInBackground(Void... params) {
-//	                try {
-//	                    InputStream in = new java.net.URL(t.getUser().getProfileImage()).openStream();
-//	                    bitmap = BitmapFactory.decodeStream(in);
-//	                } catch (Exception e) {
-//	                   // log error
-//	                }
-//	                return null;
-//	            }
-//
-//	            @Override
-//	            protected void onPostExecute(Bitmap result) {
-//	                if (bitmap != null)
-//	                	userProfilePicture.setImageBitmap(result);
-//	            }
-//
-//	       }.execute();
-			
 			
 			return convertView;
 		}

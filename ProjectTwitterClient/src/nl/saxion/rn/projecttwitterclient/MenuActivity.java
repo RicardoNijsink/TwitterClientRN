@@ -1,5 +1,6 @@
 package nl.saxion.rn.projecttwitterclient;
 
+import CommunicateToTwitter.BearerTokenManager;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,8 +9,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.Toast;
 
 public class MenuActivity extends Activity {
+	private BearerTokenManager manager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -18,6 +21,10 @@ public class MenuActivity extends Activity {
 		
 		Button buttonZoeken = (Button) findViewById(R.id.buttonZoeken);
 		Button buttonInloggen = (Button) findViewById(R.id.buttonInloggen);
+		Button buttonTimeLine = (Button) findViewById(R.id.buttonTimeLine);
+		TwitterApplication app = (TwitterApplication)getApplicationContext();
+		
+		manager = app.getManager();
 		
 		buttonZoeken.setOnClickListener(new OnClickListener() {
 
@@ -33,8 +40,24 @@ public class MenuActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
+				if(!manager.isLoggedIn()){
 				Intent intent = new Intent(MenuActivity.this, SignInPage.class);
 				startActivity(intent);
+				}
+				else{
+					Toast.makeText(getApplicationContext(), "U bent al ingelogd", Toast.LENGTH_LONG).show();
+				}
+			}
+		});
+		
+		buttonTimeLine.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				if(manager.isLoggedIn()){
+					Intent intent = new Intent(MenuActivity.this, UserActivity.class);
+					startActivity(intent);
+				}
 			}
 		});
 	}
