@@ -33,7 +33,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class MainActivity extends Activity {
+public class SearchActivity extends Activity {
 	private ListView list;
 	private TweetAdapter adapter;
 	private TwitterModel model;
@@ -142,7 +142,7 @@ public class MainActivity extends Activity {
 	 */
 	public void parseJSON(JSONObject statuses) {
 		try{
-			
+			model.getTweets().clear();
 //			String result = readAssetIntoString("searchresult.json");
 			Log.d("JSON inlezen", "Geslaagd");
 			

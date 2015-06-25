@@ -21,6 +21,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.ParseException;
 import android.os.AsyncTask;
+import android.sax.StartElementListener;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ClickableSpan;
@@ -71,10 +72,19 @@ public class TweetAdapter extends ArrayAdapter<Tweet> implements Observer{
 					
 				}
 			});
-
-		    createdAt.setText("" + t.getCreatedAt());
-			userName.setText("" + t.getUser().getName());
-			text.setText(setSpanColor(t));
+			
+			if(t.getCreatedAt().length() > 0){
+				createdAt.setText("" + t.getCreatedAt());
+				createdAt.setVisibility(View.VISIBLE);
+			}
+			if(t.getUser().getName().length() > 0){
+				userName.setText("" + t.getUser().getName());
+				userName.setVisibility(View.VISIBLE);
+			}
+			if(t.getText().length() > 0){
+				text.setText(setSpanColor(t));
+				text.setVisibility(View.VISIBLE);
+			}
 			if(location != null){
 				location.setText("" + t.getLocation());
 			}
@@ -88,7 +98,7 @@ public class TweetAdapter extends ArrayAdapter<Tweet> implements Observer{
 			notifyDataSetChanged();
 		}
 		
-		public SpannableString setSpanColor(Tweet t) {
+		private SpannableString setSpanColor(Tweet t) {
 			SpannableString spanText = new SpannableString(t.getText());
 			for(int i = 0; i < t.getHashTags().size(); i++){
 				HashTag hashTag = t.getHashTags().get(i);
@@ -110,6 +120,13 @@ public class TweetAdapter extends ArrayAdapter<Tweet> implements Observer{
 			}
 			
 			return spanText;
+		}
+		
+		private ClickableSpan setClickableSpan(String text) {
+			SpannableString string = new SpannableString(t.getText());
+			
+			//TODO
+			return null;
 		}
 		
 		private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {

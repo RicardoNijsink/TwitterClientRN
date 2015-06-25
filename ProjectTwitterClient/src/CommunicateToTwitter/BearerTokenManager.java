@@ -67,10 +67,6 @@ public class BearerTokenManager {
 		oAuthProvider = new CommonsHttpOAuthProvider(OAUTH_REQUEST_URL, OAUTH_ACCESS_URL, OAUTH_AUTHORIZE_URL);
 	}
 	
-	public boolean isUserLoggedIn() {
-		return loggedIn;
-	}
-	
 	public String getRequestToken() {
 		try {
 			this.url = new GetRequestToken().execute().get();

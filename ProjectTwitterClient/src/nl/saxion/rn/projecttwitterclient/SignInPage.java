@@ -2,6 +2,7 @@ package nl.saxion.rn.projecttwitterclient;
 
 import CommunicateToTwitter.BearerTokenManager;
 import android.app.Activity;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,6 +24,11 @@ public class SignInPage extends Activity {
 		
 		manager = app.getManager();
 		
+		if(manager.isLoggedIn()){
+			Intent intent = new Intent(SignInPage.this, TimeLineActivity.class);
+			startActivity(intent);
+		}
+		
 		webview.loadUrl(manager.getRequestToken());
 		
 		webview.setWebViewClient(new WebViewClient() {
@@ -38,6 +44,8 @@ public class SignInPage extends Activity {
 				manager.setOauthVerifier(oauth_verifier);
 				manager.retreiveAccessToken();
 				
+				Intent intent = new Intent(SignInPage.this, TimeLineActivity.class);
+				startActivity(intent);
 				finish();
 				return true;
 			}
