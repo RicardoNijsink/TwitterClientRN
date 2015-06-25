@@ -96,8 +96,9 @@ public class UserActivity extends Activity {
 				e1.printStackTrace();
 			}
 			
+			String coded = "";
 			try {
-				schermnaamOntvanger = URLEncoder.encode(schermnaamOntvanger, "UTF-8");
+				coded = URLEncoder.encode("PdegrootSax", "UTF-8");
 			} catch (UnsupportedEncodingException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -113,7 +114,8 @@ public class UserActivity extends Activity {
 			Log.d("wat zijn de waarden nu", msgContent + schermnaamOntvanger + userId);
 			
 			HttpClient client = new DefaultHttpClient();
-			HttpPost httpPost = new HttpPost("https://api.twitter.com/1.1/direct_messages/new.json?text=" + msgContent + "&screen_name=" + schermnaamOntvanger + "&user_id=" + userId);
+			HttpPost httpPost = new HttpPost("https://api.twitter.com/1.1/direct_messages/new.json?text=" + msgContent + "&screen_name=" + coded);
+			//+ "&user_id=" + "@Pdegroot");
 			
 			try {
 				manager.signWithUserToken(httpPost);
