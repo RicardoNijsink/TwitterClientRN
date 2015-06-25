@@ -119,9 +119,8 @@ public class TimeLineActivity extends Activity {
 			        public void onClick(DialogInterface dialog, int item) {
 			             // Do something with the selection
 			        }
+
 			    });
-			    AlertDialog alert = builder.create();
-			    alert.show();
 			}
 		});
 	}
