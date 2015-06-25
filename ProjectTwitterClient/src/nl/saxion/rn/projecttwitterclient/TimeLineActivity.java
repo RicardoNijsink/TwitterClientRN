@@ -47,6 +47,7 @@ public class TimeLineActivity extends Activity {
 	private BearerTokenManager manager;
 	private ArrayList<Tweet> timeLineTweets = new ArrayList<>();
 	private TweetAdapter adapter;
+	private CharSequence[] friendsList;
 	private TextView textViewTimeLineName, textViewTimeLineDescription, textViewTimeLineCreatedAt,
 	textViewTimeLineLocation, listViewTimeLineTweets;
 	private EditText editTextTweetTimeLine;
@@ -67,7 +68,8 @@ public class TimeLineActivity extends Activity {
 		editTextTweetTimeLine = (EditText)findViewById(R.id.editTextTweetTimeLine);
 		buttonTweetTimeLine = (Button)findViewById(R.id.buttonTweetTimeLine);
 		buttonFriendsTimeLine = (Button)findViewById(R.id.buttonFollowers);
-	
+		friendsList = new CharSequence[100];
+
 		ListView listViewTimeLineTweets = (ListView)findViewById(R.id.listViewTimeLineTweets);
 		
 		adapter = new TweetAdapter(getApplicationContext(), R.layout.tweet, new ArrayList<Tweet>());
@@ -95,15 +97,31 @@ public class TimeLineActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
-			    builder.setTitle("Vrienden")
-			           .setItems(TODO, new DialogInterface.OnClickListener() {
-			               public void onClick(DialogInterface dialog, int which) {
-			               // The 'which' argument contains the index position
-			               // of the selected item
-			           }
+				new GetFriendsList().execute();
+				
+//				AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
+//			    builder.setTitle("Vrienden");
+//			    
+//			    builder.setAdapter(dialogAdapter, new DialogInterface.OnClickListener() {
+//	
+//			    	@Override
+//					public void onClick(DialogInterface dialog, int which) {
+//			    			
+//					}
+//				});
+//			    
+//			    AlertDialog dialog = builder.create();
+//			    dialog.show();
+				
+			    AlertDialog.Builder builder = new AlertDialog.Builder(TimeLineActivity.this);
+			    builder.setTitle("Make your selection");
+			    builder.setItems(friendsList, new DialogInterface.OnClickListener() {
+			        public void onClick(DialogInterface dialog, int item) {
+			             // Do something with the selection
+			        }
 			    });
-			    builder.create();
+			    AlertDialog alert = builder.create();
+			    alert.show();
 			}
 		});
 	}
@@ -297,14 +315,75 @@ public class TimeLineActivity extends Activity {
 		
 	}
 	
-	private class GetFriendsList extends AsyncTask<Void, Void, Void> {
+	private class GetFriendsList extends AsyncTask<Void, Void, ArrayList<User>> {
 
 		@Override
-		protected Void doInBackground(Void... params) {
-			// TODO Auto-generated method stub
-			return null;
+		protected ArrayList<User> doInBackground(Void... params) {
+			
+			HttpClient client = new DefaultHttpClient();
+			HttpGet httpGet = new HttpGet("https://api.twitter.com/1.1/friends/list.json");
+			
+			try {
+				manager.signWithUserToken(httpGet);
+			} catch (OAuthException e1) {
+				Log.d("Signing", "Signing failed");
+			}
+			
+			ResponseHandler<String> handler = new BasicResponseHandler();
+			String result = "";
+			
+			try {
+				result = client.execute(httpGet, handler);
+				Log.d("Result get friends", result);
+			} catch (ClientProtocolException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			JSONObject resultObject = new JSONObject();
+			try {
+				resultObject = new JSONObject(result);
+			} catch (JSONException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			ArrayList<User> friendsFromGet = new ArrayList<>();
+			try {
+				JSONArray friendsArray = resultObject.getJSONArray("users");
+				
+				for(int i = 0; i < friendsArray.length(); i++) {
+					User userToAdd = new User(friendsArray.getJSONObject(i));
+					Log.d("User", userToAdd.getName());
+					
+					if(userToAdd != null){
+						friendsFromGet.add(userToAdd);
+					}
+				}
+				
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			return friendsFromGet;
 		}
 		
+		@Override
+		protected void onPostExecute(ArrayList<User> result) {
+			
+			if(result != null){
+			    for(int i = 0; i < result.size(); i++){
+			    	if(result.get(i).getName() != null){
+			    		friendsList[i] = result.get(i).getName();
+			    		Log.d("User added", result.get(i).getName());
+			    	}
+			    }
+			}
+		}
 	}
 
 	@Override
