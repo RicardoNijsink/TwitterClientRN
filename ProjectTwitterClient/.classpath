@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="lib" path="C:/Users/Niek/Downloads/signpost-core-1.2.1.2.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Niek/Downloads/signpost-commonshttp4-1.2.1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Ricardo/Downloads/signpost-core-1.2.1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Ricardo/Downloads/signpost-commonshttp4-1.2.1.2.jar"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
