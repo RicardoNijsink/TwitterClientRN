@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -65,17 +66,16 @@ public class UserActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(UserActivity.this, PostDirectMsg.class);
-				startActivity(intent);
+				new PostDirectMsg().execute();
 			}
 			
 		});
 	}
 	
-	private class PostDirectMsg extends AsyncTask<String, Void, Void> {
+	private class PostDirectMsg extends AsyncTask<Void, Void, Void> {
 
 		@Override
-		protected Void doInBackground(String... params) {
+		protected Void doInBackground(Void... params) {
 			TwitterApplication app = (TwitterApplication)getApplicationContext();
 			BearerTokenManager manager = app.getManager();
 			
@@ -83,9 +83,11 @@ public class UserActivity extends Activity {
 				return null;
 			}
 			
-			String msgContent = msgText.toString();
-			String schermnaamOntvanger = name.toString();
-			String userId = name.toString();
+			String msgContent = msgText.getText().toString();
+			String schermnaamOntvanger = name.getText().toString();
+			String userId = name.getText().toString();
+			
+			Log.d("wat zijn de waarden", msgContent + schermnaamOntvanger + userId);
 			
 			try {
 				msgContent = URLEncoder.encode(msgContent, "UTF-8");
@@ -108,14 +110,17 @@ public class UserActivity extends Activity {
 				e1.printStackTrace();
 			}
 			
+			Log.d("wat zijn de waarden nu", msgContent + schermnaamOntvanger + userId);
+			
 			HttpClient client = new DefaultHttpClient();
 			HttpPost httpPost = new HttpPost("https://api.twitter.com/1.1/direct_messages/new.json?text=" + msgContent + "&screen_name=" + schermnaamOntvanger + "&user_id=" + userId);
 			
 			try {
 				manager.signWithUserToken(httpPost);
 			} catch (OAuthException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
+				Toast.makeText(getApplicationContext(), "SignInError", Toast.LENGTH_LONG).show();
+				return null;
 			}
 			
 			
@@ -130,6 +135,8 @@ public class UserActivity extends Activity {
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				Toast.makeText(getApplicationContext(), "Geen verbinding.", Toast.LENGTH_LONG).show();
+				return null;
 			}
 			
 			return null;
@@ -138,8 +145,6 @@ public class UserActivity extends Activity {
 		@Override
 		protected void onPostExecute(Void result) {
 			Toast.makeText(getApplicationContext(), "Het versturen van het bericht is gelukt.", Toast.LENGTH_LONG).show();
-			//Intent intent = new Intent(UserActivity.this, TimeLineActivity.class);
-			//startActivity(intent);
 		}
 		
 	}

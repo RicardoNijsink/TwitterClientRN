@@ -97,7 +97,7 @@ public class TimeLineActivity extends Activity {
 			public void onClick(View v) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
 			    builder.setTitle("Vrienden")
-			           .setItems(TODO, new DialogInterface.OnClickListener() {
+			           .setItems(1, new DialogInterface.OnClickListener() {
 			               public void onClick(DialogInterface dialog, int which) {
 			               // The 'which' argument contains the index position
 			               // of the selected item
