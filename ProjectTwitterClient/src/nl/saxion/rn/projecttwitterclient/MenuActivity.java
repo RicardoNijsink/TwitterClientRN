@@ -22,29 +22,30 @@ public class MenuActivity extends Activity {
 		Button buttonZoeken = (Button) findViewById(R.id.buttonZoeken);
 		Button buttonInloggen = (Button) findViewById(R.id.buttonInloggen);
 		Button buttonTimeLine = (Button) findViewById(R.id.buttonTimeLine);
-		TwitterApplication app = (TwitterApplication)getApplicationContext();
-		
+		TwitterApplication app = (TwitterApplication) getApplicationContext();
+
 		manager = app.getManager();
-		
+
 		buttonZoeken.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(MenuActivity.this, SearchActivity.class);
+				Intent intent = new Intent(MenuActivity.this,
+						SearchActivity.class);
 				startActivity(intent);
 			}
-			
+
 		});
-		
+
 		buttonInloggen.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
-				if(!manager.isLoggedIn()){
-				Intent intent = new Intent(MenuActivity.this, SignInPage.class);
-				startActivity(intent);
-				}
-				else{
+				if (!manager.isLoggedIn()) {
+					Intent intent = new Intent(MenuActivity.this,
+							SignInPage.class);
+					startActivity(intent);
+				}		else{
 					Toast.makeText(getApplicationContext(), "U bent al ingelogd", Toast.LENGTH_LONG).show();
 				}
 			}
@@ -70,6 +71,8 @@ public class MenuActivity extends Activity {
 			}
 			
 		});
+		
+		
 	}
 	
 	@Override

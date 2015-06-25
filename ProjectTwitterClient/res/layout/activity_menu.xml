@@ -28,4 +28,10 @@
         android:layout_height="wrap_content"
         android:text="TimeLine" />
 
+    <Button
+        android:id="@+id/buttonTweet"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Tweet" />
+
 </LinearLayout>
