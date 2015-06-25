@@ -59,4 +59,25 @@
         android:text="Small Text"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
+    <EditText
+        android:id="@+id/editTextMsgText"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:ems="10" >
+
+        <requestFocus />
+    </EditText>
+
+    <Button
+        android:id="@+id/buttonDirectMsg"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="stuur bericht" />
+
+    <TextView
+        android:id="@+id/textViewMsgInfo"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="een bericht sturen kan alleen als je elkaar volgt" />
+
 </LinearLayout>
