@@ -1,9 +1,6 @@
 package nl.saxion.rn.projecttwitterclient;
 
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -12,16 +9,13 @@ import nl.rn.projecttwitterclient.model.HashTag;
 import nl.rn.projecttwitterclient.model.Tweet;
 import nl.rn.projecttwitterclient.model.TwitterModel;
 import nl.rn.projecttwitterclient.model.URL;
-import nl.rn.projecttwitterclient.model.User;
 import nl.rn.projecttwitterclient.model.UserMention;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.net.ParseException;
 import android.os.AsyncTask;
-import android.sax.StartElementListener;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ClickableSpan;
@@ -38,7 +32,6 @@ import android.widget.TextView;
 public class TweetAdapter extends ArrayAdapter<Tweet> implements Observer{
 	private LayoutInflater inflater;
 	private Context context;
-	private TwitterModel model;
 	private Tweet t;
 	private ImageView userProfilePicture;
 
@@ -102,19 +95,22 @@ public class TweetAdapter extends ArrayAdapter<Tweet> implements Observer{
 			SpannableString spanText = new SpannableString(t.getText());
 			for(int i = 0; i < t.getHashTags().size(); i++){
 				HashTag hashTag = t.getHashTags().get(i);
+				Log.d("Hashtag", String.valueOf(hashTag.getBeginPosition()));
 				spanText.setSpan(new ForegroundColorSpan(Color.BLUE), hashTag.getBeginPosition(), hashTag.getEndPosition(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 			}
 			
 			if(t.getUrls().size() != 0){
 				for(int counter = 0; counter < t.getUrls().size(); counter++){
 					URL url = t.getUrls().get(counter);
+					Log.d("URL", String.valueOf(url.getBeginPosition()));
 					spanText.setSpan(new ForegroundColorSpan(Color.BLUE), url.getBeginPosition(), url.getEndPosition(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 				}
 			}
 			
 			if(t.getUserMentions().size() != 0){
-				for(int umCounter = 0; umCounter < t.getUrls().size(); umCounter++){
+				for(int umCounter = 0; umCounter < t.getUserMentions().size(); umCounter++){
 					UserMention userMention = t.getUserMentions().get(umCounter);
+					Log.d("UserMention", String.valueOf(userMention.getBeginPosition()));
 					spanText.setSpan(new ForegroundColorSpan(Color.BLUE), userMention.getBeginPosition(), userMention.getEndPosition(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 				}
 			}
@@ -152,6 +148,6 @@ public class TweetAdapter extends ArrayAdapter<Tweet> implements Observer{
 			  protected void onPostExecute(Bitmap result) {
 			      bmImage.setImageBitmap(result);
 			  }
-			}
+		}
 
 }

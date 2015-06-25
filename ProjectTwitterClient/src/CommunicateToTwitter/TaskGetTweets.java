@@ -96,7 +96,7 @@ public class TaskGetTweets extends AsyncTask<String, Double, JSONObject> {
 			e.printStackTrace();
 		}
 		
-		return jason;//returned de JSONObject
+		return jason;//returned het JSONObject
 	}
 	
 	protected void onProgressUpdate(Double... percent) {

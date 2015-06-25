@@ -24,6 +24,8 @@ import org.json.JSONObject;
 
 import CommunicateToTwitter.BearerTokenManager;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -48,7 +50,7 @@ public class TimeLineActivity extends Activity {
 	private TextView textViewTimeLineName, textViewTimeLineDescription, textViewTimeLineCreatedAt,
 	textViewTimeLineLocation, listViewTimeLineTweets;
 	private EditText editTextTweetTimeLine;
-	private Button buttonTweetTimeLine;
+	private Button buttonTweetTimeLine, buttonFriendsTimeLine;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +66,8 @@ public class TimeLineActivity extends Activity {
 		textViewTimeLineLocation = (TextView)findViewById(R.id.textViewTimeLineLocation);
 		editTextTweetTimeLine = (EditText)findViewById(R.id.editTextTweetTimeLine);
 		buttonTweetTimeLine = (Button)findViewById(R.id.buttonTweetTimeLine);
-		
+		buttonFriendsTimeLine = (Button)findViewById(R.id.buttonFollowers);
+	
 		ListView listViewTimeLineTweets = (ListView)findViewById(R.id.listViewTimeLineTweets);
 		
 		adapter = new TweetAdapter(getApplicationContext(), R.layout.tweet, new ArrayList<Tweet>());
@@ -85,6 +88,22 @@ public class TimeLineActivity extends Activity {
 				else{
 					Toast.makeText(getApplicationContext(), "U moet een geldige tweet posten", Toast.LENGTH_LONG).show();
 				}
+			}
+		});
+		
+		buttonFriendsTimeLine.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
+			    builder.setTitle("Vrienden")
+			           .setItems(TODO, new DialogInterface.OnClickListener() {
+			               public void onClick(DialogInterface dialog, int which) {
+			               // The 'which' argument contains the index position
+			               // of the selected item
+			           }
+			    });
+			    builder.create();
 			}
 		});
 	}
@@ -169,7 +188,7 @@ public class TimeLineActivity extends Activity {
 			}
 			
 			HttpClient client = new DefaultHttpClient();
-			HttpGet httpGet = new HttpGet("https://api.twitter.com/1.1/statuses/home_timeline.json");
+			HttpGet httpGet = new HttpGet("https://api.twitter.com/1.1/statuses/home_timeline.json?count=80");
 			
 			try {
 				manager.signWithUserToken(httpGet);
@@ -277,11 +296,21 @@ public class TimeLineActivity extends Activity {
 		}
 		
 	}
+	
+	private class GetFriendsList extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.time_line, menu);
+		getMenuInflater().inflate(R.menu.menu, menu);
 		return true;
 	}
 
@@ -291,8 +320,10 @@ public class TimeLineActivity extends Activity {
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
+		if(id == R.id.action_hoofdmenu) {
+			Intent intent = new Intent(TimeLineActivity.this, MenuActivity.class);
+			startActivity(intent);
+			finish();
 		}
 		return super.onOptionsItemSelected(item);
 	}

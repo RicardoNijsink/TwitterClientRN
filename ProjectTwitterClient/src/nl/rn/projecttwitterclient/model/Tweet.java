@@ -27,56 +27,102 @@ public class Tweet {
 	public Tweet(JSONObject tweet) {
 		try{
 			createdAt = tweet.getString("created_at");
-			text = tweet.getString("text");
-			
-			try{
-				JSONObject entities = new JSONObject(tweet.getString("entities"));
-				JSONArray hashTags = entities.getJSONArray("hashtags");
-				
-				if(hashTags.length() != 0){
-					for(int counter = 0; counter < hashTags.length(); counter++){
-							HashTag hashTag = new HashTag(hashTags.getJSONObject(counter));
-							hashTagsList.add(hashTag);
-					}
-				}
-				
-				JSONArray urls = entities.getJSONArray("media");
-				
-				if(urls.length() != 0){
-					for(int urlcounter = 0; urlcounter < urls.length(); urlcounter++){
-						try{
-							URL url = new URL(urls.getJSONObject(urlcounter));
-							urlsList.add(url);
-						}
-						catch(JSONException e){
-							Log.d("URL", "URL Mislukt");
-						}	
-					}
-				}
-				
-				JSONArray userMentions = entities.getJSONArray("user_mentions");
-				
-				if(userMentions.length() != 0){
-					for(int userMentionsCounter = 0; userMentionsCounter < userMentions.length(); userMentionsCounter++){
-						try{
-							UserMention userMention = new UserMention(userMentions.getJSONObject(userMentionsCounter));
-							userMentionsList.add(userMention);
-						}
-						catch(JSONException e){
-							Log.d("User Mention", "UM Mislukt");
-						}
-					}
-				}
-			}
-			catch(JSONException e){
-				Log.d("Entities parsen", "Mislukt");
-			}
-			
-		JSONObject userToAdd = new JSONObject(tweet.getString("user"));
-		user = new User(userToAdd);
+		} catch(JSONException e){
+			Log.d("Created at", "Created at mislukt");
 		}
-		catch(JSONException e){
-			Log.d("Tweet parsen", "Mislukt");
+		
+		try{
+			text = tweet.getString("text");
+		} catch(JSONException e){
+			Log.d("Text", "Text mislukt");
+		}
+			
+		JSONObject entities = new JSONObject();
+		
+		try{
+			entities = new JSONObject(tweet.getString("entities"));
+			Log.d("Entities overzicht", String.valueOf(entities));
+		} catch(JSONException e){
+			Log.d("Entities", "Entities mislukt");
+		}
+			
+		JSONArray hashTags = new JSONArray();
+		
+		try{
+			hashTags = entities.getJSONArray("hashtags");
+		} catch(JSONException e){
+			Log.d("Hashtags", "Hashtags mislukt");
+		}
+		
+		if(hashTags.length() != 0){
+			for(int counter = 0; counter < hashTags.length(); counter++){
+				try{	
+					HashTag hashTag = new HashTag(hashTags.getJSONObject(counter));
+					hashTagsList.add(hashTag);
+				}
+				catch(JSONException e){
+					Log.d("Hashtag", "Hashtag mislukt");
+				}
+			}
+		}
+				
+		JSONArray urls = new JSONArray();
+				
+		try{
+			urls = entities.getJSONArray("media");
+			Log.d("URL lengte", String.valueOf(urls.length()));
+		} catch(JSONException e){
+			Log.d("Urls", "Urls mislukt");
+		}
+		
+		if(urls.length() == 0){
+			try{
+				urls = entities.getJSONArray("urls");
+				Log.d("URL lengte", String.valueOf(urls.length()));
+			} catch(JSONException e){
+				Log.d("Urls", "Urls niet gevonden");
+			}
+		}
+				
+		if(urls.length() != 0){
+			for(int urlcounter = 0; urlcounter < urls.length(); urlcounter++){
+				try{
+					URL url = new URL(urls.getJSONObject(urlcounter));
+					Log.d("URL pos", String.valueOf(url.getBeginPosition()));
+					urlsList.add(url);
+				}
+				catch(JSONException e){
+					Log.d("URL", "URL mislukt");
+				}	
+			}
+		}
+				
+		JSONArray userMentions = new JSONArray();
+				
+		try{
+			userMentions = entities.getJSONArray("user_mentions");
+		} catch(JSONException e){
+			Log.d("User mentions", "User mentions mislukt");
+		}
+				
+		if(userMentions.length() != 0){
+			for(int userMentionsCounter = 0; userMentionsCounter < userMentions.length(); userMentionsCounter++){
+				try{ 	
+					UserMention userMention = new UserMention(userMentions.getJSONObject(userMentionsCounter));
+					userMentionsList.add(userMention);
+					Log.d("User mention list", userMentionsList.toString());
+				}
+				catch(JSONException e){
+					Log.d("User Mention", "UM mislukt");
+				}
+			}
+		}	
+				
+		try{	
+			JSONObject userToAdd = new JSONObject(tweet.getString("user"));
+			user = new User(userToAdd);
+		} catch(JSONException e){
+			Log.d("User", "User mislukt");
 		}
 	}
 	
