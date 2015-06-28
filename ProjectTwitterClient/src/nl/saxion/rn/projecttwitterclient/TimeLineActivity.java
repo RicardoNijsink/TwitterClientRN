@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
+import nl.rn.projecttwitterclient.model.DirectMessage;
 import nl.rn.projecttwitterclient.model.Tweet;
+import nl.rn.projecttwitterclient.model.TwitterModel;
 import nl.rn.projecttwitterclient.model.User;
 import oauth.signpost.exception.OAuthException;
 
@@ -22,9 +22,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import CommunicateToTwitter.BearerTokenManager;
+import CommunicateToTwitter.TokenManager;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -34,41 +35,45 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class TimeLineActivity extends Activity {
-	private BearerTokenManager manager;
+	private static TokenManager manager;
+	private TwitterModel model;
 	private ArrayList<Tweet> timeLineTweets = new ArrayList<>();
 	private TweetAdapter adapter;
-	private CharSequence[] friendsList;
-	private TextView textViewTimeLineName, textViewTimeLineDescription, textViewTimeLineCreatedAt,
-	textViewTimeLineLocation, listViewTimeLineTweets;
+	private static String[] friendsList;
+	private String[] directMessages = new String[10];
+	private TextView textViewTimeLineName, textViewTimeLineDescription,	textViewTimeLineLocation, listViewTimeLineTweets;
 	private EditText editTextTweetTimeLine;
-	private Button buttonTweetTimeLine, buttonFriendsTimeLine;
+	private Button buttonTweetTimeLine, buttonFriendsTimeLine, buttonDirectMessagesTimeLine;
 
+	/**
+	 * Hier worden alle user interface-componenten en onClickListeners gedeclareerd en alle asyncTasks aangeroepen.
+	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_time_line);
 		
 		TwitterApplication app = (TwitterApplication)getApplicationContext();
+		model = app.getModel();
 		manager = app.getManager();
 		
 		textViewTimeLineName = (TextView)findViewById(R.id.textViewTimeLineName);
 		textViewTimeLineDescription = (TextView)findViewById(R.id.textViewTimeLineDescription);
-		textViewTimeLineCreatedAt = (TextView)findViewById(R.id.textViewTimeLineCreatedAt);
 		textViewTimeLineLocation = (TextView)findViewById(R.id.textViewTimeLineLocation);
 		editTextTweetTimeLine = (EditText)findViewById(R.id.editTextTweetTimeLine);
 		buttonTweetTimeLine = (Button)findViewById(R.id.buttonTweetTimeLine);
 		buttonFriendsTimeLine = (Button)findViewById(R.id.buttonFollowers);
-		friendsList = new CharSequence[100];
+		buttonDirectMessagesTimeLine = (Button)findViewById(R.id.buttonDirectMessages);
+		friendsList = new String[100];
 
 		ListView listViewTimeLineTweets = (ListView)findViewById(R.id.listViewTimeLineTweets);
 		
@@ -76,6 +81,8 @@ public class TimeLineActivity extends Activity {
 		
 		new GetUserInfo().execute();
 		new GetTimeLine().execute();
+		new GetDirectMessages().execute();
+		new GetFriendsList(manager).execute();
 		
 		listViewTimeLineTweets.setAdapter(adapter);
 		
@@ -83,6 +90,8 @@ public class TimeLineActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
+				Log.d("Messagessssss", directMessages[1]);
+				
 				if(editTextTweetTimeLine.getText().length() > 1){
 					String tweet = String.valueOf(editTextTweetTimeLine.getText());
 					new PostTweet().execute(tweet);
@@ -97,31 +106,33 @@ public class TimeLineActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				new GetFriendsList().execute();
+				String[] friends = new String[10];
+				ArrayAdapter<String> adapterArray = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1);
 				
-//				AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
-//			    builder.setTitle("Vrienden");
-//			    
-//			    builder.setAdapter(dialogAdapter, new DialogInterface.OnClickListener() {
-//	
-//			    	@Override
-//					public void onClick(DialogInterface dialog, int which) {
-//			    			
-//					}
-//				});
-//			    
-//			    AlertDialog dialog = builder.create();
-//			    dialog.show();
+				for(int i = 0; i < friendsList.length; i++){
+					if(friendsList[i] != null){
+						friends[i] = friendsList[i];
+						adapterArray.add(friends[i]);
+						Log.d("Friends", friends[i]);
+					}
+				}
 				
-			    AlertDialog.Builder builder = new AlertDialog.Builder(TimeLineActivity.this);
-			    builder.setTitle("Make your selection");
-			    builder.setItems(friendsList, new DialogInterface.OnClickListener() {
-			        public void onClick(DialogInterface dialog, int item) {
-			             // Do something with the selection
-			        }
-
-			    });
+				
+				AlertDialog.Builder builderDialog = new Builder(getApplicationContext());
+				builderDialog.setAdapter(adapterArray, new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+					}
+				});
+				
+				AlertDialog dialog = builderDialog.create();
+				dialog.setTitle("Uw vrienden");
+				dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT); 
+				
+				dialog.show();
 			}
+			
 		});
 	}
 	
@@ -154,11 +165,9 @@ public class TimeLineActivity extends Activity {
 				result = client.execute(httpGet, handler);
 				Log.d("Result time line", result);
 			} catch (ClientProtocolException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.d("Request user info uitvoeren", "Uitvoeren mislukt");
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.d("Request user info uitvoeren", "Uitvoeren mislukt");
 			}
 			
 			User userToDisplay = null;
@@ -168,33 +177,33 @@ public class TimeLineActivity extends Activity {
 				
 				Log.d("userToDisplay", userToDisplay.getName());
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.d("JSON parsen", "Parsen mislukt");
 			}
-			
 			
 			return userToDisplay;
 		}
 		
+		//Hier wordt alle ontvangen informatie in de bijbehorende textviews ingevuld
 		@Override
 		protected void onPostExecute(User result) {
-			Log.d("User", result.toString());
-			
 			if(result != null){
+				Log.d("User", result.toString());
+				
 				textViewTimeLineName.setText(result.getName());
 				textViewTimeLineName.setVisibility(View.VISIBLE);
 				textViewTimeLineDescription.setText(result.getDescription());
 				textViewTimeLineDescription.setVisibility(View.VISIBLE);
-				textViewTimeLineCreatedAt.setText(result.getCreatedAt());
-				textViewTimeLineCreatedAt.setVisibility(View.VISIBLE);
 				textViewTimeLineLocation.setText(result.getLocation());
 				textViewTimeLineLocation.setVisibility(View.VISIBLE);
 			}
 		}
-		
 	}
 	
-	
+	/**
+	 * AsyncTask voor het ophalen van de timeline van de ingelogde gebruiker
+	 * @author Ricardo
+	 *
+	 */
 	private class GetTimeLine extends AsyncTask<Void, Void, ArrayList<Tweet>> {
 
 		@Override
@@ -220,11 +229,9 @@ public class TimeLineActivity extends Activity {
 				result = client.execute(httpGet, handler);
 				Log.d("Result time line", result);
 			} catch (ClientProtocolException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.d("Request timeline uitvoeren ", "Uitvoeren mislukt");
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.d("Request timeline uitvoeren ", "Uitvoeren mislukt");
 			}
 			
 			ArrayList<Tweet> tweetsFromGet = new ArrayList<>();
@@ -241,22 +248,31 @@ public class TimeLineActivity extends Activity {
 				}
 				
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			Log.d("JSON parsen timeline", "Parsen mislukt");
 			}
 			
 			return tweetsFromGet;
 		}
 		
+		//Hier worden alle ontvangen tweets en bijbehorende gebruikers aan het model toegevoegd
 		@Override
 		protected void onPostExecute(ArrayList<Tweet> result) {
-			adapter.addAll(result);
+			for(Tweet t : result){
+				adapter.add(t);
+				model.addTweet(t);
+				model.addUser(t.getUser());
+			}
+			
 			Log.d("Result Post", result.get(0).getText());
 			adapter = new TweetAdapter(getApplicationContext(), R.layout.tweet, result);
 		}
-		
 	}
 	
+	/**
+	 * AsyncTask voor het posten van een tweet
+	 * @author Ricardo
+	 *
+	 */
 	private class PostTweet extends AsyncTask<String, Void, Void> {
 
 		@Override
@@ -275,8 +291,7 @@ public class TimeLineActivity extends Activity {
 			try {
 				encodedPost = URLEncoder.encode(postTweet, "UTF-8");
 			} catch (UnsupportedEncodingException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				Log.d("Tweet coderen", "Coderen mislukt");
 			}
 			
 			HttpClient client = new DefaultHttpClient();
@@ -285,8 +300,7 @@ public class TimeLineActivity extends Activity {
 			try {
 				manager.signWithUserToken(httpPost);
 			} catch (OAuthException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				Log.d("Request tweet posten signen", "Signen mislukt");
 			}
 			
 			
@@ -296,11 +310,9 @@ public class TimeLineActivity extends Activity {
 			try {
 				result = client.execute(httpPost, handler);
 			} catch (ClientProtocolException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.d("Request tweet posten uitvoeren ", "Uitvoeren mislukt");
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.d("Request tweet posten uitvoeren ", "Uitvoeren mislukt");
 			}
 			
 			return null;
@@ -314,8 +326,18 @@ public class TimeLineActivity extends Activity {
 		
 	}
 	
-	private class GetFriendsList extends AsyncTask<Void, Void, ArrayList<User>> {
-
+	/**
+	 * AsyncTask voor het ophalen van de vriendenlijst van de ingelogde gebruiker
+	 * @author Ricardo
+	 *
+	 */
+	public static class GetFriendsList extends AsyncTask<Void, Void, ArrayList<User>> {
+		private TokenManager manager;
+		
+		public GetFriendsList(TokenManager manager) {
+			this.manager = manager;
+		}
+		
 		@Override
 		protected ArrayList<User> doInBackground(Void... params) {
 			
@@ -335,19 +357,16 @@ public class TimeLineActivity extends Activity {
 				result = client.execute(httpGet, handler);
 				Log.d("Result get friends", result);
 			} catch (ClientProtocolException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.d("Request get friends uitvoeren ", "Uitvoeren mislukt");
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.d("Request get friends uitvoeren ", "Uitvoeren mislukt");
 			}
 			
 			JSONObject resultObject = new JSONObject();
 			try {
 				resultObject = new JSONObject(result);
 			} catch (JSONException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				Log.d("JSON friends parsen", "Parsen mislukt");
 			}
 			
 			ArrayList<User> friendsFromGet = new ArrayList<>();
@@ -364,8 +383,7 @@ public class TimeLineActivity extends Activity {
 				}
 				
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.d("JSONArray friends parsen", "Parsen mislukt");
 			}
 			
 			return friendsFromGet;
@@ -384,7 +402,113 @@ public class TimeLineActivity extends Activity {
 			}
 		}
 	}
+	
+	/**
+	 * AsyncTask voor het ophalen van alle ontvangen direct messages
+	 * @author Ricardo
+	 *
+	 */
+	private class GetDirectMessages extends AsyncTask<Void, Void, ArrayList<DirectMessage>> {
 
+		@Override
+		protected ArrayList<DirectMessage> doInBackground(Void... params) {
+			if(params == null){
+				return null;
+			}
+			
+			HttpClient client = new DefaultHttpClient();
+			HttpGet httpGet = new HttpGet("https://api.twitter.com/1.1/direct_messages.json?count=10");
+			
+			try {
+				manager.signWithUserToken(httpGet);
+			} catch (OAuthException e1) {
+				Log.d("Signing", "Signing failed");
+			}
+			
+			ResponseHandler<String> handler = new BasicResponseHandler();
+			String result = "";
+			
+			try {
+				result = client.execute(httpGet, handler);
+				Log.d("Result ", result);
+			} catch (ClientProtocolException e) {
+				Log.d("Request get direct messages uitvoeren ", "Uitvoeren mislukt");
+			} catch (IOException e) {
+				Log.d("Request get direct messages uitvoeren ", "Uitvoeren mislukt");
+			}
+			
+			JSONArray directMessagesArray = new JSONArray();
+			
+			try {
+				directMessagesArray = new JSONArray(result);
+				Log.d("Array", directMessagesArray.toString());
+			} catch (JSONException e) {
+				Log.d("JSONArray direct messages parsen", "Parsen mislukt");
+			}
+			
+			ArrayList<DirectMessage> messages = new ArrayList<>();
+			
+			for(int i = 0; i < directMessagesArray.length(); i++){
+				DirectMessage message = null;
+				try {
+					message = new DirectMessage(directMessagesArray.getJSONObject(i));
+					messages.add(message);
+					Log.d("Message to add", message.toString());
+				} catch (JSONException e) {
+					Log.d("JSONArray direct messages parsen", "Parsen mislukt");
+				}
+			}
+			
+			return messages;
+		}
+		
+		//Hier worden de direct messages aan de array van de activity toegevoegd en wordt de onClickListener van de directMessages gemaakt
+		@Override
+		protected void onPostExecute(ArrayList<DirectMessage> result) {
+			if(result.size() > 0){
+				for(int i = 0; i < result.size(); i++){
+					directMessages[i] = result.get(i).toString();
+					Log.d("Direct messages", directMessages[i]);
+				}
+			}
+			
+			buttonDirectMessagesTimeLine.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					String[] messages = new String[10];
+					ArrayAdapter<String> adapterArray = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1);
+					
+					for(int i = 0; i < directMessages.length; i++){
+						if(directMessages[i] != null){
+							messages[i] = directMessages[i];
+							adapterArray.add(directMessages[i]);
+							Log.d("Messages", messages[i]);
+						}
+					}
+					
+					
+					AlertDialog.Builder builderDialog = new Builder(getApplicationContext());
+					builderDialog.setAdapter(adapterArray, new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+						}
+					});
+					
+					AlertDialog dialog = builderDialog.create();
+					dialog.setTitle("Uw ontvangen direct messages");
+					dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT); 
+					
+					dialog.show();
+				}
+				
+			});
+			
+		}
+		
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -404,5 +528,12 @@ public class TimeLineActivity extends Activity {
 			finish();
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	@Override
+	public void onBackPressed() {
+		Intent intent = new Intent(TimeLineActivity.this, MenuActivity.class);
+		startActivity(intent);
+		finish();
 	}
 }

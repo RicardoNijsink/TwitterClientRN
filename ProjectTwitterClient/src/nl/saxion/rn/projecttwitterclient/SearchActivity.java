@@ -1,19 +1,13 @@
 package nl.saxion.rn.projecttwitterclient;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.concurrent.ExecutionException;
 
-import nl.rn.projecttwitterclient.model.HashTag;
 import nl.rn.projecttwitterclient.model.Tweet;
 import nl.rn.projecttwitterclient.model.TwitterModel;
-import nl.rn.projecttwitterclient.model.URL;
 import nl.rn.projecttwitterclient.model.User;
-import nl.rn.projecttwitterclient.model.UserMention;
 import oauth.signpost.exception.OAuthException;
 
 import org.apache.http.client.ClientProtocolException;
@@ -27,10 +21,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import CommunicateToTwitter.TaskGetTweets;
-import CommunicateToTwitter.BearerTokenManager;
+import CommunicateToTwitter.TokenManager;
 import android.app.Activity;
-import android.content.Intent;
-import android.content.res.AssetManager;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -50,8 +44,12 @@ public class SearchActivity extends Activity {
 	private TweetAdapter adapter;
 	private TwitterModel model;
 	private JSONObject searchResult;
-	private BearerTokenManager bearerTokenManager;
+	private TokenManager tokenManager;
+	private String screen_name;
 
+	/**
+	 * Hier worden alle user interface-componenten en onClickListeners gedeclareerd
+	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -64,20 +62,19 @@ public class SearchActivity extends Activity {
 		TwitterApplication app = (TwitterApplication) getApplicationContext();
 		
 		model = app.getModel();
-		bearerTokenManager = app.getManager();
+		tokenManager = app.getManager();
 		
-		Log.d("Bearer token", model.bearerToken);
-		Log.d("Bearer token manager", bearerTokenManager.bearerToken);
+		Log.d("Bearer token", tokenManager.bearerToken);
+		Log.d("Token manager", tokenManager.bearerToken);
 		
 		adapter = new TweetAdapter(this, R.layout.tweet, model.getTweets());
-		//model.addObserver(adapter);
 		list.setAdapter(adapter);
 		
 		buttonStartSearch.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				TaskGetTweets task = new TaskGetTweets(bearerTokenManager);
+				TaskGetTweets task = new TaskGetTweets(tokenManager);
 				try {
 					searchResult = task.execute(editTextSearch.getText().toString()).get();
 					parseJSON(searchResult);
@@ -98,7 +95,6 @@ public class SearchActivity extends Activity {
 			@Override
 			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 				User user = adapter.getItem(position).getUser();
-				String screen_name = "";
 				if(user.getScreenName().length() > 0){
 					screen_name = user.getScreenName();
 				}
@@ -106,46 +102,33 @@ public class SearchActivity extends Activity {
 					Log.d("Screen Name", "Geen screen name");
 				}
 				
-				new CreateFriendship().execute(screen_name);
+				AlertDialog alertDialog = new AlertDialog.Builder(SearchActivity.this).create();
+				alertDialog.setTitle("Vriend toevoegen");
+				alertDialog.setMessage("Wilt u deze gebruiker toevoegen als vriend");
+				alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Ja", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						if(tokenManager.isLoggedIn()){
+							new CreateFriendship().execute(screen_name);
+						}
+						else{
+							Toast.makeText(getApplicationContext(), "U moet ingelogd zijn om iemand te volgen", Toast.LENGTH_LONG).show();
+						}
+					}
+				});
+				alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Nee", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+					}
+				});
+				alertDialog.show();
 				
 				return true;
 			}
 		});
 	}
-	
- 	/**
-     * Reads an asset file and returns a string with the full contents.
-     *
-     * @param filename  The filename of the file to read.
-     * @return          The contents of the file.
-     * @throws IOException  If file could not be found or not read.
-     */
-    private String readAssetIntoString(String filename) throws IOException {
-		BufferedReader br = null;
-		StringBuilder sb = new StringBuilder();
- 
-		String line;
-		try {
-			InputStream is = getAssets().open(filename, AssetManager.ACCESS_BUFFER);
-			br = new BufferedReader(new InputStreamReader(is));
-			while ((line = br.readLine()) != null) {
-				sb.append(line);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-            throw e;
-		} finally {
-			if (br != null) {
-				try {
-					br.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return sb.toString();	
-    }
-	
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -167,21 +150,17 @@ public class SearchActivity extends Activity {
 	}
 	
 	/**
-	 * Parses a JSON-file to classes.
-	 * Gets the tweets and users and adds them to the model.
-	 *  
+	 * Parsed de ontvangen tweets om naar classes om zo in de listView weer te geven
 	 */
 	public void parseJSON(JSONObject statuses) {
 		try{
 			model.getTweets().clear();
-//			String result = readAssetIntoString("searchresult.json");
+			model.getUsers().clear();
 			Log.d("JSON inlezen", "Geslaagd");
 			
-			//JSONObject statuses = new JSONObject(result);
 			JSONArray statusArray = statuses.getJSONArray("statuses");
 			
 			for(int i = 0; i < statusArray.length(); i++) {
-				JSONObject tweet = statusArray.getJSONObject(i);
 				
 				Tweet tweetToAdd = new Tweet(statusArray.getJSONObject(i));
 				
@@ -192,18 +171,17 @@ public class SearchActivity extends Activity {
 				Log.d("Tweets", String.valueOf(model.getTweets().size()));
 			}
 		}
-//		catch (IOException e) {
-//			Toast toast = new Toast(getApplicationContext());
-//			toast.setText("Couldn't find data");
-//			toast.show();
-//			Log.d("JSON uitlezen", "Fout");
-//		}
 		catch (JSONException e) {
 			Toast.makeText(getApplicationContext(), "Couldn't find data", Toast.LENGTH_LONG).show();
 			Log.d("JSON uitlezen", "Fout");
 		}
 	}
 	
+	/**
+	 * AsyncTask voor het toevoegen van een vriend
+	 * @author Ricardo
+	 *
+	 */
 	private class CreateFriendship extends AsyncTask<String, Void, String> {
 
 		@Override
@@ -214,15 +192,14 @@ public class SearchActivity extends Activity {
 			try {
 				encodedUser = URLEncoder.encode(params[0], "UTF-8");
 			} catch (UnsupportedEncodingException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				Log.d("Gebruiker coderen", "Coderen mislukt");
 			}
 			
 			HttpClient client = new DefaultHttpClient();
 			HttpPost httpPost = new HttpPost("https://api.twitter.com/1.1/friendships/create.json?screen_name=" + encodedUser + "&follow=true");
 			
 			try {
-				bearerTokenManager.signWithUserToken(httpPost);
+				tokenManager.signWithUserToken(httpPost);
 			} catch (OAuthException e1) {
 				Toast.makeText(getApplicationContext(), "U moet ingelogd zijn om iemand te volgen", Toast.LENGTH_SHORT).show();
 			}
@@ -233,11 +210,9 @@ public class SearchActivity extends Activity {
 			try {
 				result = client.execute(httpPost, handler);
 			} catch (ClientProtocolException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.d("Request uitvoeren", "Uitvoeren mislukt");
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.d("Request uitvoeren", "Uitvoeren mislukt");
 			}
 			
 			if(result.length() > 0){

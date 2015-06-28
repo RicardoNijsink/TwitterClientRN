@@ -1,6 +1,10 @@
 package nl.saxion.rn.projecttwitterclient;
 
-import CommunicateToTwitter.BearerTokenManager;
+import java.util.concurrent.ExecutionException;
+
+import CommunicateToTwitter.TokenManager;
+import CommunicateToTwitter.TokenManager.GetRequestToken;
+import CommunicateToTwitter.TokenManager.RetreiveAccessToken;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -12,7 +16,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 public class SignInPage extends Activity {
-	BearerTokenManager manager;
+	TokenManager manager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -29,24 +33,46 @@ public class SignInPage extends Activity {
 			startActivity(intent);
 		}
 		
-		webview.loadUrl(manager.getRequestToken());
+		GetRequestToken requestToken = new GetRequestToken();
+		try {
+			webview.loadUrl(requestToken.execute().get());
+		} catch (InterruptedException e) {
+			Log.d("Request token ophalen", "Ophalen mislukt");
+		} catch (ExecutionException e) {
+			Log.d("Request token ophalen", "Ophalen mislukt");
+		}
 		
+		/**
+		 * Controleert of de url in de webview begint met de callbackurl.
+		 * Als dit het geval is dan wordt de verifier code opgehaald en daarmee wordt vervolgens de acces token opgehaald.
+		 * Vervolgens wordt de TimeLineActivity gestart.
+		 * Als dit niet het geval is, wordt de MenuActivity gestart.
+		 */
 		webview.setWebViewClient(new WebViewClient() {
 			@Override
 			public boolean shouldOverrideUrlLoading(WebView view, String url) {
-				if(url.startsWith(BearerTokenManager.CALL_BACK_URL));
-				manager.setLoggedIn(true);
-				
-				Uri verifierCode = Uri.parse(url);
-				String oauth_verifier = verifierCode.getQueryParameter("oauth_verifier");
-				Log.d("Verifier", oauth_verifier);
-				
-				manager.setOauthVerifier(oauth_verifier);
-				manager.retreiveAccessToken();
-				
-				Intent intent = new Intent(SignInPage.this, TimeLineActivity.class);
-				startActivity(intent);
-				finish();
+				if(url.startsWith(TokenManager.CALL_BACK_URL)){
+					
+					Uri verifierCode = Uri.parse(url);
+					String oauth_verifier = verifierCode.getQueryParameter("oauth_verifier");
+					
+					if(oauth_verifier != null){
+						Log.d("Verifier", oauth_verifier);
+						manager.setLoggedIn(true);
+						
+						manager.setOauthVerifier(oauth_verifier);
+						new RetreiveAccessToken().execute();
+						
+						Intent intent = new Intent(SignInPage.this, TimeLineActivity.class);
+						startActivity(intent);
+						finish();
+					}
+					else{
+						Intent intent = new Intent(SignInPage.this, MenuActivity.class);
+						startActivity(intent);
+						finish();
+					}
+				}
 				return true;
 			}
 		});

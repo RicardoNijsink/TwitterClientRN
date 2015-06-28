@@ -1,24 +1,27 @@
 package nl.saxion.rn.projecttwitterclient;
 
 import nl.rn.projecttwitterclient.model.TwitterModel;
-import CommunicateToTwitter.BearerTokenManager;
+import CommunicateToTwitter.TokenManager;
 import android.app.Application;
 
 public class TwitterApplication extends Application {
 	private TwitterModel twitterModel;
-	private BearerTokenManager manager;
+	private TokenManager manager;
 	
+	/**
+	 * Hier worden het model en de manager aangemaakt
+	 */
 	@Override
 	public void onCreate() {
 		twitterModel = new TwitterModel();
-		manager = new BearerTokenManager(twitterModel);
+		manager = new TokenManager(twitterModel);
 	}
 	
 	public TwitterModel getModel() {
 		return twitterModel;
 	}
 	
-	public BearerTokenManager getManager() {
+	public TokenManager getManager() {
 		return manager;
 	}
 

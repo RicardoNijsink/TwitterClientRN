@@ -2,65 +2,61 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#55ACEE"
     android:orientation="vertical" >
 
     <ImageView
         android:id="@+id/imageViewUserPicture"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_launcher" />
+        android:layout_height="150dp"
+        android:src="@drawable/empty" />
 
     <TextView
         android:id="@+id/textViewName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Large Text"
         android:gravity="center"
+        android:paddingBottom="30dp"
+        android:text="Large Text"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView
         android:id="@+id/textViewDescription"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingBottom="20dp"
         android:text="Medium Text"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:paddingBottom="25dp" >
 
         <TextView
             android:id="@+id/textViewFollowers"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Small Text"
             android:layout_weight="0.5"
+            android:paddingLeft="10dp"
+            android:paddingRight="15dp"
+            android:text="Small Text"
             android:textAppearance="?android:attr/textAppearanceSmall" />
-
-        <View
-            android:id="@+id/view1"
-            android:layout_width="54dp"
-            android:layout_height="16dp" />
 
         <TextView
             android:id="@+id/textViewFriends"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Small Text"
             android:layout_weight="0.5"
+            android:paddingRight="15dp"
+            android:text="Small Text"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/textViewCreatedAt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Small Text"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
-
     <EditText
-        android:id="@+id/editTextMsgText"
+        android:id="@+id/editTextDirectMessage"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:ems="10" >
@@ -69,15 +65,9 @@
     </EditText>
 
     <Button
-        android:id="@+id/buttonDirectMsg"
+        android:id="@+id/buttonDirectMessage"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="stuur bericht" />
-
-    <TextView
-        android:id="@+id/textViewMsgInfo"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="een bericht sturen kan alleen als je elkaar volgt" />
+        android:text="Stuur bericht" />
 
 </LinearLayout>

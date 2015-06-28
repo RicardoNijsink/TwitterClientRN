@@ -25,12 +25,17 @@ import org.json.JSONObject;
 
 import android.os.AsyncTask;
 import android.util.Log;
-											//params progress result
+					
+/**
+ * AsyncTask voor het ophalen van tweets bij een zoekopdracht
+ * @author Ricardo
+ *
+ */
 public class TaskGetTweets extends AsyncTask<String, Double, JSONObject> {
 	private TwitterModel model;
-	private BearerTokenManager manager;
+	private TokenManager manager;
 	
-	public TaskGetTweets(BearerTokenManager manager) {
+	public TaskGetTweets(TokenManager manager) {
 		this.manager = manager;
 	}
 
@@ -58,14 +63,18 @@ public class TaskGetTweets extends AsyncTask<String, Double, JSONObject> {
 		HttpClient client = new DefaultHttpClient();
 		HttpGet httpGet = new HttpGet("https://api.twitter.com/1.1/search/tweets.json?q=" + encodedSearch);
 		
-		//httpGet.setHeader("Authorization", "Bearer " + model.bearerToken);
-		try {
-			manager.signWithUserToken(httpGet);
-		} catch (OAuthException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		//Controleert of de gebruiker is ingelogd. Als dit het geval is wordt de acces token gebruikt.
+		//Anders wordt de bearer token gebruikt.
+		if(manager.isLoggedIn()){
+			try {
+				manager.signWithUserToken(httpGet);
+			} catch (OAuthException e1) {
+				Log.d("Request signen", "Signen mislukt");
+			}
 		}
-		//Log.d("Bearer token request", model.bearerToken);
+		else{
+			httpGet.setHeader("Authorization", "Bearer " + manager.bearerToken);
+		}
 		
 		
 		ResponseHandler<String> handler = new BasicResponseHandler();
@@ -74,33 +83,18 @@ public class TaskGetTweets extends AsyncTask<String, Double, JSONObject> {
 		try {
 			result = client.execute(httpGet, handler);
 		} catch (ClientProtocolException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.d("Request uitvoeren", "Uitvoeren mislukt");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.d("Request uitvoeren", "Uitvoeren mislukt");
 		}
 		
-		//loop tot het klaar is
-		//publishProgress();
-		
-		//je ontvangt een String van twitter
-		
-		//deel om de String naar een JSONObject te parsen
 		JSONObject jason = null;
 		try {
 			jason = new JSONObject(result);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			Log.d("JSON parsen uit tweets", "Omvormen kan niet");
-			e.printStackTrace();
 		}
 		
-		return jason;//returned het JSONObject
-	}
-	
-	protected void onProgressUpdate(Double... percent) {
-		//iets om de voortgang weer te geven
-		//zet hoeveel gedownload/TOTAAL in een label ofzo via een methode in de scherm activity
+		return jason;
 	}
 }

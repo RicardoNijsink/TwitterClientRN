@@ -1,26 +1,20 @@
 package nl.rn.projecttwitterclient.model;
 
-import java.net.URL;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.util.Log;
 
 public class User {
-	private String createdAt, description, location, name, screen_name;
+	private String description, location, name, screen_name;
 	private int followersCount, friendsCount;
 	private String profileImageURL;
 	
-	public User(String createdAt, String description, String location, String name, int followersCount, int friendsCount) {
-		this.createdAt = createdAt;
-		this.description = description;
-		this.location = location;
-		this.name = name;
-		this.followersCount = followersCount;
-		this.friendsCount = friendsCount;
-	}
-	
+	/**
+	 * De constructor van een User.
+	 * Vormt het opgegeven JSONObject om naar een User.
+	 * @param user Het om te vormen JSONObject
+	 */
 	public User(JSONObject user) {
 		try{
 			name = user.getString("name");
@@ -38,10 +32,6 @@ public class User {
 
 	public void setProfileImage(String profileImage) {
 		this.profileImageURL = profileImage;
-	}
-
-	public String getCreatedAt() {
-		return createdAt;
 	}
 
 	public String getDescription() {

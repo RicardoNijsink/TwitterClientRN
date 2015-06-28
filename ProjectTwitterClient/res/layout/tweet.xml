@@ -6,10 +6,9 @@
 
     <ImageView
         android:id="@+id/imageViewUserProfilePicture"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingRight="10dp"
-        android:src="@drawable/ic_launcher" />
+        android:layout_width="84dp"
+        android:layout_height="80dp"
+        android:src="@drawable/empty" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -33,6 +32,8 @@
                 android:id="@+id/textViewTweet"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:autoLink="web"
+                android:textColorLink="#FF0000FF"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="#314d61"
                 android:visibility="invisible" />

@@ -17,13 +17,11 @@ public class Tweet {
 	private ArrayList<URL> urlsList = new ArrayList<>();
 	private ArrayList<UserMention> userMentionsList = new ArrayList<>();
 	
-	public Tweet(String createdAt, String text, User user, String location) {
-		this.createdAt = createdAt;
-		this.text = text;
-		this.user = user;
-		this.location = location;
-	}
-	
+	/**
+	 * De constructor voor een tweet
+	 * Vormt het opgegeven JSONObject om naar een tweet
+	 * @param tweet Het om te vormen JSONObject
+	 */
 	public Tweet(JSONObject tweet) {
 		try{
 			createdAt = tweet.getString("created_at");

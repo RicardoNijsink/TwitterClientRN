@@ -1,24 +1,20 @@
 package nl.saxion.rn.projecttwitterclient;
 
-import java.io.InputStream;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import com.squareup.picasso.Picasso;
+
 import nl.rn.projecttwitterclient.model.HashTag;
 import nl.rn.projecttwitterclient.model.Tweet;
-import nl.rn.projecttwitterclient.model.TwitterModel;
 import nl.rn.projecttwitterclient.model.URL;
 import nl.rn.projecttwitterclient.model.UserMention;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.text.Spannable;
 import android.text.SpannableString;
-import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -49,6 +45,7 @@ public class TweetAdapter extends ArrayAdapter<Tweet> implements Observer{
 			
 			t = getItem(position);
 			
+			//Hier worden alle user interface-componenten en onClickListeners gedeclareerd
 			TextView userName = (TextView)convertView.findViewById(R.id.textViewUserName);
 			TextView text = (TextView)convertView.findViewById(R.id.textViewTweet);
 			TextView createdAt = (TextView)convertView.findViewById(R.id.textViewTweetCreatedAt);
@@ -60,12 +57,15 @@ public class TweetAdapter extends ArrayAdapter<Tweet> implements Observer{
 				@Override
 				public void onClick(View v) {
 					Intent intent = new Intent(getContext(), UserActivity.class);
+					intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					intent.putExtra("naam", t.getUser().getName());
 					intent.putExtra("Position", position);
 					getContext().startActivity(intent);
 					
 				}
 			});
 			
+			//Hier worden alle gegevens in de bijbehorende user interface-componenten ingevuld
 			if(t.getCreatedAt().length() > 0){
 				createdAt.setText("" + t.getCreatedAt());
 				createdAt.setVisibility(View.VISIBLE);
@@ -81,7 +81,8 @@ public class TweetAdapter extends ArrayAdapter<Tweet> implements Observer{
 			if(location != null){
 				location.setText("" + t.getLocation());
 			}
-			new DownloadImageTask(userProfilePicture).execute(t.getUser().getProfileImageURL());
+			
+			Picasso.with(getContext()).load(t.getUser().getProfileImageURL()).into(userProfilePicture);
 			
 			return convertView;
 		}
@@ -91,6 +92,11 @@ public class TweetAdapter extends ArrayAdapter<Tweet> implements Observer{
 			notifyDataSetChanged();
 		}
 		
+		/**
+		 * Methode voor het kleuren van alle user mentions, hashtags en urls.
+		 * @param t
+		 * @return
+		 */
 		private SpannableString setSpanColor(Tweet t) {
 			SpannableString spanText = new SpannableString(t.getText());
 			for(int i = 0; i < t.getHashTags().size(); i++){
@@ -117,37 +123,4 @@ public class TweetAdapter extends ArrayAdapter<Tweet> implements Observer{
 			
 			return spanText;
 		}
-		
-		private ClickableSpan setClickableSpan(String text) {
-			SpannableString string = new SpannableString(t.getText());
-			
-			//TODO
-			return null;
-		}
-		
-		private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-			  ImageView bmImage;
-
-			  public DownloadImageTask(ImageView bmImage) {
-			      this.bmImage = bmImage;
-			  }
-
-			  protected Bitmap doInBackground(String... urls) {
-			      String urldisplay = urls[0];
-			      Bitmap images = null;
-			      try {
-			        InputStream in = new java.net.URL(urldisplay).openStream();
-			        images = BitmapFactory.decodeStream(in);
-			      } catch (Exception e) {
-			          Log.e("Error", e.getMessage());
-			          e.printStackTrace();
-			      }
-			      return images;
-			  }
-
-			  protected void onPostExecute(Bitmap result) {
-			      bmImage.setImageBitmap(result);
-			  }
-		}
-
 }

@@ -9,6 +9,11 @@ import android.util.Log;
 public abstract class Entity {
 	private int beginPosition, endPosition;
 	
+	/**
+	 * De constructor van een entity.
+	 * Het opgegeven JSONObject wordt omgevormd naar een entity
+	 * @param entity Het om te vormen JSONObject
+	 */
 	public Entity(JSONObject entity) {
 		try {
 			JSONArray indices = entity.getJSONArray("indices");
